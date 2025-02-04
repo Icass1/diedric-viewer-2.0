@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 class DiedricNumber {
     constructor() {}
@@ -8,16 +8,51 @@ class DiedricVector {
     constructor() {}
 }
 
-function Expression() {
-    const [value, setValue] = useState("");
+function Expression({
+    expressions,
+    setExpressions,
+}: {
+    expressions: { [key: string]: DiedricNumber | DiedricVector }[];
+    setExpressions: React.Dispatch<
+        React.SetStateAction<
+            {
+                [key: string]: DiedricNumber | DiedricVector;
+            }[]
+        >
+    >;
+}) {
+    const [value, setValue] = useState("Px = 5");
+    const [sliderValue, setSliderValue] = useState(5);
 
+    const [expression, setExpression] = useState<DiedricNumber | DiedricVector>(
+        undefined
+    );
+    useEffect(() => {
+        if (expressions.includes(expression)) return;
+        if (!expression) return;
+
+        setExpressions((value) => [...value, { Px: expression }]);
+    }, [expression, expressions, setExpressions]);
     return (
         <div className="bg-neutral-300 p-2 rounded">
             <input
                 value={value}
                 onChange={(e) => setValue(e.currentTarget.value)}
                 className="bg-neutral-300 focus:outline-none border-b-2 w-full border-neutral-600 border-solid"
-            ></input>
+            />
+            <div className="flex flex-row items-center">
+                <label>-10</label>
+                <input
+                    type="range"
+                    min={-10}
+                    max={10}
+                    value={sliderValue}
+                    onChange={(e) =>
+                        setSliderValue(Number(e.currentTarget.value))
+                    }
+                ></input>
+                <label>10</label>
+            </div>
         </div>
     );
 }
@@ -290,10 +325,17 @@ function BlockBuilder() {
 }
 
 function App() {
+    const [expressions, setExpressions] = useState<
+        { [key: string]: DiedricNumber | DiedricVector }[]
+    >([]);
+
     return (
         <div className="grid grid-cols-[400px_1fr] h-full">
             <div className="bg-red-400 flex flex-col p-2">
-                <Expression></Expression>
+                <Expression
+                    expressions={expressions}
+                    setExpressions={setExpressions}
+                ></Expression>
             </div>
             <BlockBuilder />
         </div>
