@@ -1,0 +1,59 @@
+{
+    "inputs": [
+        {
+            "type": "DiedricPlane",
+            "id": "sffaweva",
+            "color": "#c74440",
+            "x": 10,
+            "y": 40
+        },
+        {
+            "type": "DiedricLine",
+            "id": "feafva",
+            "color": "#2d70b3",
+            "x": 10,
+            "y": 250
+        }
+    ],
+    "ouputs": [
+        {
+            "type": "DiedricPoint",
+            "id": "fafghswffv",
+            "color": "#2d70b3",
+            "inputs": {
+                "r": ["fawefvawtr", "value"]
+            },
+            "x": 700,
+            "y": 230
+        }
+    ],
+    "blocks": [
+        {
+            "id": "afaevase",
+            "type": "calc",
+            "inputs": {
+                "v": ["sffaweva", "v"],
+                "d": ["sffaweva", "d"],
+                "b": ["feafva", "v"],
+                "r": ["feafva", "r"]
+            },
+            "outputs": "math exp",
+            "color": "#388c46",
+            "x": 200,
+            "y": 100
+        },
+        {
+            "id": "fawefvawtr",
+            "type": "calcVect",
+            "outputs": ["math exp", "math exp", "math exp"],
+            "inputs": {
+                "lambda": ["afaevase", "value"],
+                "v": ["feafva", "v"],
+                "r": ["feafva", "r"]
+            },
+            "color": "#fa7e19",
+            "x": 450,
+            "y": 230
+        }
+    ]
+}
