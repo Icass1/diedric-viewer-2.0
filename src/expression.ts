@@ -4,7 +4,7 @@ import { DiedricNumber } from "./diedric/number";
 import { DiedricPlane } from "./diedric/plane";
 import { DiedricPoint } from "./diedric/point";
 import { DiedricVector } from "./diedric/vector";
-import { blocks, objects } from "./tempConstants";
+import { Block, blocks, objects, SubBlock } from "./tempConstants";
 import { compareArrays } from "./utils/compareArrays";
 
 interface ExpressionListener {
@@ -60,7 +60,6 @@ export class Expression {
         );
         if (!match) {
             console.warn("Syntax error");
-
             this.error = true;
             return;
         }
@@ -68,8 +67,6 @@ export class Expression {
 
         this._name = match[1] || match[3];
         this._params = this.parseParams(match[2] || match[4]);
-
-        console.log(this._name, this._params);
 
         // Check special case where the expression is only a number.
         if (this._params.length == 1 && typeof this._params[0] == "number") {
@@ -99,7 +96,16 @@ export class Expression {
             // If a parsed parameter is undefined because the expression doesn't exists or exists but it's value is undefined, set error to true.
             if (this._parsedParams.includes(undefined)) {
                 console.warn("There is a _parsedParams that is undefined");
+
+
+
                 this.error = true;
+                
+                this._expressions.forEach((expression) => {
+                    if (expression._params && expression._params.includes(this._name)) {
+                        expression.parseText();
+                    }
+                });
                 return;
             }
 
@@ -130,7 +136,7 @@ export class Expression {
             const match = matches[0]; // Temporary get always first match
 
             // If there are multiple outputs, the expression cannot be set to a variable. Until lists are implemented.
-            if (match.ouputs.length > 1 && this._name) {
+            if (match.outputs.length > 1 && this._name) {
                 console.warn(
                     "Unable to asing multiple objects to one variable"
                 );
@@ -140,15 +146,27 @@ export class Expression {
 
             const updatedValues = [];
 
-            match.ouputs.map((output) => {
-                const parsedInputs = { ...output.inputs };
+            match.outputs.map((output) => {
+                const parsedInputs = { ...output.inputs } as SubBlock["inputs"] | { [key: string]: DiedricVector | DiedricNumber };
 
-                Object.entries(output.inputs).map((input) => {
+                Object.entries(output.inputs).map((input, index) => {
                     const blockId = input[1][0];
 
-                    const block = match.blocks.find(
+                    let block: SubBlock | undefined
+                    block = match.blocks.find(
                         (block) => block.id == blockId
                     );
+                    if (!block) {
+                        block = match.inputs.find(
+                            (block) => block.id == blockId
+                        );
+                    }
+
+                    if (!block) {
+                        console.warn("Block not found. searching for", blockId)
+                        this.error = true
+                        return
+                    }
                     if (block.type == "calc") {
                         parsedInputs[input[0]] = this.evalCalcBlock(
                             match,
@@ -159,30 +177,27 @@ export class Expression {
                             match,
                             block
                         );
-                    }
+                    } else if (block.type == "DiedricPoint" && this._parsedParams[index] instanceof DiedricPoint) {
+                        // TODO - This condition has to be checked with other examples
+                        parsedInputs[input[0]] = this._parsedParams[index].r
+                    } else { console.warn("Unkwown block.type", block.type) }
                 });
 
-                console.log(this._values);
 
                 const valueToUpdate = this._values.find((value) => {
-                    console.log(
-                        "ASDf",
-                        value instanceof objects[output.type].prototype,
-                        !updatedValues.includes(value)
-                    );
                     return (
                         value instanceof objects[output.type].prototype &&
                         !updatedValues.includes(value)
                     );
                 });
                 if (valueToUpdate) {
-                    console.log("Object updated");
+                    // console.log("Object updated", valueToUpdate);
                     updatedValues.push(valueToUpdate);
                     Object.entries(parsedInputs).map((param) => {
                         valueToUpdate[param[0]] = param[1];
                     });
                 } else {
-                    console.log("New object created");
+                    // console.log("New object created");
                     // @ts-expect-error Extremely hard to type parsedInputs.
                     const newValue = new objects[output.type].prototype({
                         diedric: this._diedric,
@@ -193,25 +208,42 @@ export class Expression {
                 }
             });
         }
+        this._expressions.forEach((expression) => {
+            if (expression._params && expression._params.includes(this._name)) {
+                expression.parseText();
+            }
+        });
+
+
+
     }
 
-    evalCalcBlock(match, block) {
+    evalCalcBlock(match: Block, block: SubBlock) {
         console.warn("evalCalcBlock");
         console.warn(match, block);
+
+        return new DiedricNumber({ x: 52 })
+
     }
 
-    evalCalcVectBlock(match, block): DiedricVector {
+    evalCalcVectBlock(match: Block, block: SubBlock): DiedricVector {
         let variableDeclaration = "";
 
         // Search in inputs
         Object.entries(block.inputs).map((input, index) => {
             const a = match.inputs.find((_input) => _input.id == input[1][0]);
 
+            if (!a) return
+
             if (
                 a.type == "DiedricNumber" &&
                 this._parsedParams[index] instanceof DiedricNumber
             ) {
                 variableDeclaration += `let ${input[0]}=${this._parsedParams[index].x};`;
+
+            } else if (a.type == "DiedricPoint" &&
+                this._parsedParams[index] instanceof DiedricPoint) {
+                variableDeclaration += `let ${input[0]}={x:${this._parsedParams[index].r.x.x}, y:${this._parsedParams[index].r.y.x}, z:${this._parsedParams[index].r.z.x}};`;
             } else {
                 console.warn("To implment");
             }
@@ -219,6 +251,10 @@ export class Expression {
 
         // Search in blocks
         // TODO
+
+
+
+
 
         return new DiedricVector({
             x: new DiedricNumber({
@@ -248,7 +284,8 @@ export class Expression {
         this.parseText();
 
         this._expressions.forEach((expression) => {
-            if (expression._params && expression._params.includes(oldName)) {
+            if (expression._params && expression._params.includes(oldName) && oldName != this._name) {
+                console.warn("Variable doesn't exist")
                 expression.error = true;
             }
             if (expression._params && expression._params.includes(this._name)) {

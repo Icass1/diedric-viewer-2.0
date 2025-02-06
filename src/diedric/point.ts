@@ -99,6 +99,10 @@ export class DiedricPoint {
         this._r = newR;
     }
 
+    get r() {
+        return this._r
+    }
+
     delete() {
         this._diedric.scene.remove(this.bPoint);
         this._diedric.scene.remove(this.lineToX0Line);

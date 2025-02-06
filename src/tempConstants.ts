@@ -4,7 +4,24 @@ import { DiedricPlane } from "./diedric/plane";
 import { DiedricPoint } from "./diedric/point";
 import { DiedricVector } from "./diedric/vector";
 
-export const blocks = [
+export interface SubBlock {
+    type: string;
+    id: string;
+    color: string;
+    x: number;
+    y: number;
+    outputs?: string[];
+    inputs?: { [key: string]: [string, string] };
+}
+
+export interface Block {
+    name: string;
+    inputs: SubBlock[];
+    blocks: SubBlock[];
+    outputs: SubBlock[];
+}
+
+export const blocks: Block[] = [
     {
         name: "Point OAC",
         inputs: [
@@ -58,7 +75,7 @@ export const blocks = [
             //     y: 200,
             // },
         ],
-        ouputs: [
+        outputs: [
             {
                 type: "DiedricPoint",
                 id: "PclobZUk",
@@ -79,6 +96,52 @@ export const blocks = [
             //     x: 500,
             //     y: 220,
             // },
+        ],
+    },
+    {
+        name: "Line from two points",
+        inputs: [
+            {
+                type: "DiedricPoint",
+                color: "red",
+                x: 10,
+                y: 10,
+                id: "input-point-1",
+            },
+            {
+                type: "DiedricPoint",
+                color: "red",
+                x: 10,
+                y: 100,
+                id: "input-point-2",
+            },
+        ],
+        outputs: [
+            {
+                type: "DiedricLine",
+                id: "output-line-1",
+                color: "#c74440",
+                inputs: {
+                    r: ["input-point-1", "r"],
+                    v: ["fawefvawtr", "value"],
+                },
+                x: 500,
+                y: 30,
+            },
+        ],
+        blocks: [
+            {
+                id: "fawefvawtr",
+                type: "calcVect",
+                outputs: ["r1.x - r2.x", "r1.y - r2.y", "r1.z - r2.z"],
+                inputs: {
+                    r1: ["input-point-1", "r"],
+                    r2: ["input-point-2", "r"],
+                },
+                color: "#fa7e19",
+                x: 250,
+                y: 100,
+            },
         ],
     },
 ];

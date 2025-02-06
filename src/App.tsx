@@ -111,14 +111,63 @@ function App() {
         );
         expressions.current.push(
             new Expression({
-                text: "G = (A, B, C)",
+                text: "G = -132",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "H = (D, E, F)",
+                text: "H = 100",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "I = 34",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "J = (A, B, C)",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "K = (D, E, F)",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "M = (G, H, I)",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "t = (J, K)",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "s = (K, M)",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "u = (J, M)",
                 expressions: expressions.current,
                 diedric: diedric,
             })
@@ -128,7 +177,7 @@ function App() {
 
     return (
         <div className="grid grid-cols-[300px_1fr] h-full">
-            <div className="bg-indigo-900 flex flex-col p-2 gap-y-2">
+            <div className="bg-indigo-900 flex flex-col p-2 gap-y-2 overflow-y-auto ">
                 {expressions.current.map((expression, index) => (
                     <ExpressionRender
                         key={"expression-" + index}

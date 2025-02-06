@@ -37,9 +37,12 @@ export function BlockBuilder() {
         document
             .querySelectorAll(".line-connector.out")
             .forEach((outElement) => {
+                console.log(outElement)
                 document
                     .querySelectorAll(`#${outElement.id}.line-connector.in`)
                     .forEach((inElement) => {
+                        console.log(outElement, inElement)
+
                         const inBoundaries = inElement.getBoundingClientRect();
                         const outBoundaries =
                             outElement.getBoundingClientRect();
@@ -47,17 +50,17 @@ export function BlockBuilder() {
                         ctx.beginPath();
                         ctx.moveTo(
                             outBoundaries.x -
-                                canvasBoundaries.x +
-                                outBoundaries.width,
+                            canvasBoundaries.x +
+                            outBoundaries.width,
                             outBoundaries.y -
-                                canvasBoundaries.y +
-                                outBoundaries.height / 2
+                            canvasBoundaries.y +
+                            outBoundaries.height / 2
                         );
                         ctx.lineTo(
                             inBoundaries.x - canvasBoundaries.x,
                             inBoundaries.y -
-                                canvasBoundaries.y +
-                                inBoundaries.height / 2
+                            canvasBoundaries.y +
+                            inBoundaries.height / 2
                         );
                         ctx.stroke();
                     });
@@ -71,7 +74,7 @@ export function BlockBuilder() {
                 {blocks.map((block) => (
                     <label
                         key={"block-selection-" + block.name}
-                        onClick={() => setBlock(block)}
+                        onClick={() => { setBlock(block); console.log(block) }}
                         className="p-1 bg-neutral-400 rounded text-white font-semibold"
                     >
                         {block.name}
@@ -164,7 +167,7 @@ export function BlockBuilder() {
                         );
                     })}
                 {block &&
-                    block.ouputs.map((block, index) => {
+                    block.outputs?.map((block, index) => {
                         return (
                             <div
                                 key={"input-" + index}
