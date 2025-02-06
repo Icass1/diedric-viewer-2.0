@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { blocks, objects } from "./tempConstants";
+import { Block, blocks, objects, SubBlock } from "./tempConstants";
+import EquationEditor from "equation-editor-react";
 
 export function BlockBuilder() {
     // const colors = [
@@ -12,7 +13,7 @@ export function BlockBuilder() {
     // ];
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [block, setBlock] = useState(undefined);
+    const [block, setBlock] = useState<Block | undefined>(undefined);
 
     useLayoutEffect(() => {
         if (!canvasRef.current) return;
@@ -37,11 +38,11 @@ export function BlockBuilder() {
         document
             .querySelectorAll(".line-connector.out")
             .forEach((outElement) => {
-                console.log(outElement)
+                console.log(outElement);
                 document
                     .querySelectorAll(`#${outElement.id}.line-connector.in`)
                     .forEach((inElement) => {
-                        console.log(outElement, inElement)
+                        console.log(outElement, inElement);
 
                         const inBoundaries = inElement.getBoundingClientRect();
                         const outBoundaries =
@@ -50,17 +51,17 @@ export function BlockBuilder() {
                         ctx.beginPath();
                         ctx.moveTo(
                             outBoundaries.x -
-                            canvasBoundaries.x +
-                            outBoundaries.width,
+                                canvasBoundaries.x +
+                                outBoundaries.width,
                             outBoundaries.y -
-                            canvasBoundaries.y +
-                            outBoundaries.height / 2
+                                canvasBoundaries.y +
+                                outBoundaries.height / 2
                         );
                         ctx.lineTo(
                             inBoundaries.x - canvasBoundaries.x,
                             inBoundaries.y -
-                            canvasBoundaries.y +
-                            inBoundaries.height / 2
+                                canvasBoundaries.y +
+                                inBoundaries.height / 2
                         );
                         ctx.stroke();
                     });
@@ -74,7 +75,10 @@ export function BlockBuilder() {
                 {blocks.map((block) => (
                     <label
                         key={"block-selection-" + block.name}
-                        onClick={() => { setBlock(block); console.log(block) }}
+                        onClick={() => {
+                            setBlock(block);
+                            console.log(block);
+                        }}
                         className="p-1 bg-neutral-400 rounded text-white font-semibold"
                     >
                         {block.name}
@@ -118,7 +122,7 @@ export function BlockBuilder() {
                     })}
 
                 {block &&
-                    block.blocks.map((block, index) => {
+                    block.blocks.map((block: SubBlock, index) => {
                         return (
                             <div
                                 key={"input-" + index}
@@ -147,7 +151,14 @@ export function BlockBuilder() {
                                                         }
                                                         className="line-connector in bg-black/15 rounded-r-lg p-1 w-[70px] text-left px-2"
                                                     >
-                                                        {input[0]}
+                                                        <EquationEditor
+                                                            value={input[0]}
+                                                            onChange={() => {}}
+                                                            autoCommands={"pi"}
+                                                            autoOperatorNames={
+                                                                "sin"
+                                                            }
+                                                        />
                                                     </label>
                                                 );
                                             }
@@ -157,9 +168,20 @@ export function BlockBuilder() {
                                     <div className="flex flex-col gap-y-1 w-fit">
                                         <label
                                             id={block.id + "-value"}
-                                            className="line-connector out bg-black/15 rounded-l-lg p-1 w-[70px] text-right px-2"
+                                            className="line-connector out bg-black/15 rounded-l-lg p-1  text-right px-2"
                                         >
-                                            Out
+                                            <EquationEditor
+                                                value={
+                                                    "(" +
+                                                    block.outputs.join(
+                                                        ",\\ \\ "
+                                                    ) +
+                                                    ")"
+                                                }
+                                                onChange={() => {}}
+                                                autoCommands="pi theta sqrt sum prod alpha beta gamma rho"
+                                                autoOperatorNames="sin cos tan"
+                                            />
                                         </label>
                                     </div>
                                 </div>

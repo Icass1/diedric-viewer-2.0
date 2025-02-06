@@ -51,7 +51,7 @@ export const blocks: Block[] = [
             {
                 id: "fawefvawtr",
                 type: "calcVect",
-                outputs: ["-x", "-y", "z"],
+                outputs: ["x", "y", "z"],
                 inputs: {
                     x: ["MhHXZzLv", "x"],
                     y: ["jfUkvEjp", "x"],
@@ -61,19 +61,6 @@ export const blocks: Block[] = [
                 x: 250,
                 y: 30,
             },
-            // {
-            //     id: "ZfemTjrN",
-            //     type: "calcVect",
-            //     outputs: ["x*2", "y*2", "-z*2"],
-            //     inputs: {
-            //         x: ["MhHXZzLv", "x"],
-            //         y: ["jfUkvEjp", "x"],
-            //         z: ["FbQQmwoW", "x"],
-            //     },
-            //     color: "#fa7e19",
-            //     x: 250,
-            //     y: 200,
-            // },
         ],
         outputs: [
             {
@@ -86,16 +73,6 @@ export const blocks: Block[] = [
                 x: 500,
                 y: 60,
             },
-            // {
-            //     type: "DiedricPoint",
-            //     id: "NYxNovIl",
-            //     color: "#c74440",
-            //     inputs: {
-            //         r: ["ZfemTjrN", "value"],
-            //     },
-            //     x: 500,
-            //     y: 220,
-            // },
         ],
     },
     {
@@ -125,7 +102,7 @@ export const blocks: Block[] = [
                     r: ["input-point-1", "r"],
                     v: ["fawefvawtr", "value"],
                 },
-                x: 500,
+                x: 700,
                 y: 30,
             },
         ],
@@ -133,10 +110,10 @@ export const blocks: Block[] = [
             {
                 id: "fawefvawtr",
                 type: "calcVect",
-                outputs: ["r1.x - r2.x", "r1.y - r2.y", "r1.z - r2.z"],
+                outputs: ["r_1.x\\cdot2-r_2.x", "r_1.y - r_2.y", "r_1.z - r_2.z"],
                 inputs: {
-                    r1: ["input-point-1", "r"],
-                    r2: ["input-point-2", "r"],
+                    r_1: ["input-point-1", "r"],
+                    r_2: ["input-point-2", "r"],
                 },
                 color: "#fa7e19",
                 x: 250,
