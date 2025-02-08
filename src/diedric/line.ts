@@ -29,7 +29,6 @@ export class DiedricLine {
         diedric: Diedric;
     }) {
         this._diedric = diedric;
-        console.log("DiedricLine constructor", this._r, this._v);
 
         const color = "blue";
 
@@ -60,8 +59,9 @@ export class DiedricLine {
         this._diedric.canvas2d.add(this.horizontalProjectionLine2d);
         this._diedric.canvas2d.add(this.verticalProjectionLine2d);
 
-        this.v = v;
-        this.r = r;
+        this._v = v;
+        this._r = r;
+        this.update();
     }
 
     update() {
@@ -69,16 +69,6 @@ export class DiedricLine {
             console.warn("v or r is undefined");
             return;
         }
-
-        console.log(
-            this._r.x.x,
-            this._r.y.x,
-            this._r.z.x,
-            "->",
-            this._v.x.x,
-            this._v.y.x,
-            this._v.z.x
-        );
 
         const point = new THREE.Vector3(this._r.x.x, this._r.y.x, this._r.z.x);
         const vector = new THREE.Vector3(this._v.x.x, this._v.y.x, this._v.z.x);

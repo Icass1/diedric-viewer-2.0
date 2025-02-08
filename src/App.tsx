@@ -5,6 +5,7 @@ import { ExpressionRender } from "./ExpressionRender";
 import { BlockBuilder } from "./BlockBuilder";
 import { Diedric } from "./diedric/diedric";
 import * as THREE from "three";
+import { Block, blocks } from "./tempConstants";
 
 function App() {
     const expressions = useRef<Expression[]>([]);
@@ -33,6 +34,8 @@ function App() {
     const canvas3dRef = useRef<HTMLCanvasElement>(null);
     const canvas2dRef = useRef<HTMLCanvasElement>(null);
     const [diedric, setDiedric] = useState<Diedric>();
+
+    const [block, setBlock] = useState<Block | undefined>(blocks[2]);
 
     useEffect(() => {
         if (!currentTab) return;
@@ -151,13 +154,13 @@ function App() {
                 diedric: diedric,
             })
         );
-        expressions.current.push(
-            new Expression({
-                text: "t = (J, K)",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
+        // expressions.current.push(
+        //     new Expression({
+        //         text: "t = (J, K)",
+        //         expressions: expressions.current,
+        //         diedric: diedric,
+        //     })
+        // );
         expressions.current.push(
             new Expression({
                 text: "s = (K, M)",
@@ -168,6 +171,14 @@ function App() {
         expressions.current.push(
             new Expression({
                 text: "u = (J, M)",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+
+        expressions.current.push(
+            new Expression({
+                text: "alpha = (s, u)",
                 expressions: expressions.current,
                 diedric: diedric,
             })
@@ -186,7 +197,7 @@ function App() {
                 ))}
             </div>
             <div className="flex flex-col">
-                <div className="p-1 flex flex-row gap-x-2">
+                <div className="flex flex-row gap-x-2 p-1">
                     <button
                         className="p-1 rounded bg-green-400 text-green-800 disabled:bg-green-500 disabled:text-green-900 font-semibold"
                         disabled={currentTab == "block-builder"}
@@ -194,6 +205,23 @@ function App() {
                     >
                         Block builder
                     </button>
+                    {currentTab == "block-builder" && (
+                        <div className="flex flex-row gap-x-1 items-center">
+                            {blocks.map((block) => (
+                                <label
+                                    key={"block-selection-" + block.name}
+                                    onClick={() => {
+                                        setBlock(block);
+                                        console.log(block);
+                                    }}
+                                    className="bg-neutral-400 rounded text-white p-1"
+                                >
+                                    {block.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+
                     <button
                         className="p-1 rounded bg-green-400 text-green-800 disabled:bg-green-500 disabled:text-green-900 font-semibold"
                         disabled={currentTab == "3d"}
@@ -209,19 +237,21 @@ function App() {
                         Diedric
                     </button>
                 </div>
-                <div className="w-full h-full relative">
-                    {currentTab == "block-builder" && <BlockBuilder />}
+                <div className="w-full h-full relative min-h-0 max-h-full ">
+                    {currentTab == "block-builder" && (
+                        <BlockBuilder block={block} />
+                    )}
                     <canvas
                         ref={canvas3dRef}
                         className={
-                            "w-full h-full absolute bg-blue-400 " +
+                            "w-full h-full max-w-full max-h-full absolute " +
                             (currentTab == "3d" ? "" : "-z-50")
                         }
                     />
                     <canvas
                         ref={canvas2dRef}
                         className={
-                            "w-full h-full absolute  bg-red-400 " +
+                            "w-full h-full absolute " +
                             (currentTab == "2d" ? "" : "-z-50")
                         }
                     />

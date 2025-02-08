@@ -110,13 +110,72 @@ export const blocks: Block[] = [
             {
                 id: "fawefvawtr",
                 type: "calcVect",
-                outputs: ["r_1.x\\cdot2-r_2.x", "r_1.y - r_2.y", "r_1.z - r_2.z"],
+                outputs: ["r_1.x-r_2.x", "r_1.y - r_2.y", "r_1.z - r_2.z"],
                 inputs: {
                     r_1: ["input-point-1", "r"],
                     r_2: ["input-point-2", "r"],
                 },
                 color: "#fa7e19",
                 x: 250,
+                y: 100,
+            },
+        ],
+    },
+    {
+        name: "Plane from two lines",
+        inputs: [
+            {
+                type: "DiedricLine",
+                color: "red",
+                x: 10,
+                y: 10,
+                id: "input-point-1",
+            },
+            {
+                type: "DiedricLine",
+                color: "red",
+                x: 10,
+                y: 200,
+                id: "input-point-2",
+            },
+        ],
+        blocks: [
+            {
+                id: "fawefvawtr",
+                type: "crossVect",
+                outputs: ["r_1.x-r_2.x", "r_1.y - r_2.y", "r_1.z - r_2.z"],
+                inputs: {
+                    v_1: ["input-point-1", "v"],
+                    v_2: ["input-point-2", "v"],
+                },
+                color: "#fa7e19",
+                x: 200,
+                y: 50,
+            },
+            {
+                id: "umtzvotapk",
+                type: "calc",
+                outputs: ["v_1.x \\cdot r_1.x+v_1.y \\cdot r_1.y+v_1.z \\cdot r_1.z"],
+                inputs: {
+                    v_1: ["fawefvawtr", "value"],
+                    r_1: ["input-point-2", "r"],
+                },
+                color: "#fa7e19",
+                x: 650,
+                y: 200,
+            },
+        ],
+
+        outputs: [
+            {
+                type: "DiedricPlane",
+                id: "output-line-1",
+                color: "#c74440",
+                inputs: {
+                    v: ["fawefvawtr", "value"],
+                    d: ["umtzvotapk", "value"],
+                },
+                x: 1100,
                 y: 100,
             },
         ],

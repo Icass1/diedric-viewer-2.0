@@ -97,12 +97,13 @@ export class Expression {
             if (this._parsedParams.includes(undefined)) {
                 console.warn("There is a _parsedParams that is undefined");
 
-
-
                 this.error = true;
-                
+
                 this._expressions.forEach((expression) => {
-                    if (expression._params && expression._params.includes(this._name)) {
+                    if (
+                        expression._params &&
+                        expression._params.includes(this._name)
+                    ) {
                         expression.parseText();
                     }
                 });
@@ -147,15 +148,15 @@ export class Expression {
             const updatedValues = [];
 
             match.outputs.map((output) => {
-                const parsedInputs = { ...output.inputs } as SubBlock["inputs"] | { [key: string]: DiedricVector | DiedricNumber };
+                const parsedInputs = { ...output.inputs } as
+                    | SubBlock["inputs"]
+                    | { [key: string]: DiedricVector | DiedricNumber };
 
                 Object.entries(output.inputs).map((input, index) => {
                     const blockId = input[1][0];
 
-                    let block: SubBlock | undefined
-                    block = match.blocks.find(
-                        (block) => block.id == blockId
-                    );
+                    let block: SubBlock | undefined;
+                    block = match.blocks.find((block) => block.id == blockId);
                     if (!block) {
                         block = match.inputs.find(
                             (block) => block.id == blockId
@@ -163,12 +164,17 @@ export class Expression {
                     }
 
                     if (!block) {
-                        console.warn("Block not found. searching for", blockId)
-                        this.error = true
-                        return
+                        console.warn("Block not found. searching for", blockId);
+                        this.error = true;
+                        return;
                     }
                     if (block.type == "calc") {
                         parsedInputs[input[0]] = this.evalCalcBlock(
+                            match,
+                            block
+                        );
+                    } else if (block.type == "crossVect") {
+                        parsedInputs[input[0]] = this.evalCrossVect(
                             match,
                             block
                         );
@@ -177,12 +183,16 @@ export class Expression {
                             match,
                             block
                         );
-                    } else if (block.type == "DiedricPoint" && this._parsedParams[index] instanceof DiedricPoint) {
+                    } else if (
+                        block.type == "DiedricPoint" &&
+                        this._parsedParams[index] instanceof DiedricPoint
+                    ) {
                         // TODO - This condition has to be checked with other examples
-                        parsedInputs[input[0]] = this._parsedParams[index].r
-                    } else { console.warn("Unkwown block.type", block.type) }
+                        parsedInputs[input[0]] = this._parsedParams[index].r;
+                    } else {
+                        console.warn("Unkwown block.type", block.type);
+                    }
                 });
-
 
                 const valueToUpdate = this._values.find((value) => {
                     return (
@@ -213,58 +223,288 @@ export class Expression {
                 expression.parseText();
             }
         });
-
-
-
     }
 
     evalCalcBlock(match: Block, block: SubBlock) {
-        console.warn("evalCalcBlock");
-        console.warn(match, block);
+        if (block.outputs.length != 1) {
+            console.error("calc must have only 1 output");
+            return;
+        }
 
-        return new DiedricNumber({ x: 52 })
+        // console.log("block.inputs", block.inputs);
+        // console.log("this._parsedParams", this._parsedParams);
+        // console.log("match.inputs", match.inputs);
+        // console.log("match.blocks", match.blocks);
 
-    }
-
-    evalCalcVectBlock(match: Block, block: SubBlock): DiedricVector {
         let variableDeclaration = "";
 
-        // Search in inputs
-        Object.entries(block.inputs).map((input, index) => {
-            const a = match.inputs.find((_input) => _input.id == input[1][0]);
+        // console.log("================= inputs =================");
+        match.inputs.map((inputObject, index) => {
+            Object.entries(block.inputs).map((input) => {
+                if (input[1][0] != inputObject.id) return;
 
-            if (!a) return
+                let a: DiedricNumber | DiedricVector;
 
-            if (
-                a.type == "DiedricNumber" &&
-                this._parsedParams[index] instanceof DiedricNumber
-            ) {
-                variableDeclaration += `let ${input[0]}=${this._parsedParams[index].x};`;
+                if (input[1][1] == "value") {
+                    let value: DiedricNumber | DiedricVector;
 
-            } else if (a.type == "DiedricPoint" &&
-                this._parsedParams[index] instanceof DiedricPoint) {
-                variableDeclaration += `let ${input[0]}={x:${this._parsedParams[index].r.x.x}, y:${this._parsedParams[index].r.y.x}, z:${this._parsedParams[index].r.z.x}};`;
-            } else {
-                console.warn("To implment");
-            }
+                    // *************************************
+                    // ***************** Remove duplicate code ********************
+                    // *************************************
+
+                    if (inputObject.type == "calc") {
+                        value = this.evalCalcBlock(match, inputObject);
+                    } else if (inputObject.type == "crossVect") {
+                        value = this.evalCrossVect(match, inputObject);
+                    } else if (inputObject.type == "calcVect") {
+                        value = this.evalCalcVectBlock(match, inputObject);
+                    } else {
+                        console.warn("Unkwown block.type", inputObject.type);
+                    }
+
+                    // *************************************
+                    // *************************************
+                    // *************************************
+
+                    a = value;
+                } else {
+                    a = this._parsedParams[index][input[1][1]];
+                }
+                if (a instanceof DiedricVector) {
+                    variableDeclaration += `let ${input[0]}={x:${a.x.x}, y:${a.y.x}, z:${a.z.x}};`;
+                } else {
+                    console.warn("To implement");
+                }
+            });
         });
 
-        // Search in blocks
-        // TODO
+        // console.log("================= blocks =================");
+        match.blocks.map((inputObject, index) => {
+            Object.entries(block.inputs).map((input) => {
+                if (input[1][0] != inputObject.id) return;
 
+                let a: DiedricNumber | DiedricVector;
 
+                if (input[1][1] == "value") {
+                    let value: DiedricNumber | DiedricVector;
 
+                    // *************************************
+                    // ***************** Remove duplicate code ********************
+                    // *************************************
 
+                    if (inputObject.type == "calc") {
+                        value = this.evalCalcBlock(match, inputObject);
+                    } else if (inputObject.type == "crossVect") {
+                        value = this.evalCrossVect(match, inputObject);
+                    } else if (inputObject.type == "calcVect") {
+                        value = this.evalCalcVectBlock(match, inputObject);
+                    } else {
+                        console.warn("Unkwown block.type", inputObject.type);
+                    }
+
+                    // *************************************
+                    // *************************************
+                    // *************************************
+
+                    a = value;
+                } else {
+                    a = this._parsedParams[index][input[1][1]];
+                }
+
+                if (a instanceof DiedricVector) {
+                    variableDeclaration += `let ${input[0]}={x:${a.x.x}, y:${a.y.x}, z:${a.z.x}};`;
+                } else {
+                    console.warn("To implement", a);
+                }
+            });
+        });
+
+        return new DiedricNumber({
+            x: eval(
+                this.parseEvalExpression(variableDeclaration + block.outputs[0])
+            ),
+        });
+    }
+
+    evalCrossVect(match: Block, block: SubBlock) {
+        if (
+            Object.keys(block.inputs).length > 2 ||
+            this._parsedParams.length > 2
+        ) {
+            console.error("This should never happend");
+        }
+
+        const vect1: DiedricVector =
+            this._parsedParams[0][Object.values(block.inputs)[0][1]];
+        const vect2: DiedricVector =
+            this._parsedParams[1][Object.values(block.inputs)[1][1]];
+
+        if (!(vect1 instanceof DiedricVector)) {
+            console.error("Param 1 of cross vector is not a vector");
+        }
+        if (!(vect2 instanceof DiedricVector)) {
+            console.error("Param 2 of cross vector is not a vector");
+        }
 
         return new DiedricVector({
             x: new DiedricNumber({
-                x: eval(variableDeclaration + block.outputs[0]),
+                x: vect1.y.x * vect2.z.x - vect1.z.x * vect2.y.x,
             }),
             y: new DiedricNumber({
-                x: eval(variableDeclaration + block.outputs[1]),
+                x: vect1.z.x * vect2.x.x - vect1.x.x * vect2.z.x,
             }),
             z: new DiedricNumber({
-                x: eval(variableDeclaration + block.outputs[2]),
+                x: vect1.x.x * vect2.y.x - vect1.y.x * vect2.x.x,
+            }),
+        }).normalize();
+    }
+
+    parseEvalExpression(expr: string) {
+        expr = expr.replaceAll("\\cdot", "*");
+        for (let i = 0; i < 100; i++) {
+            expr = expr.replace(/\\frac{([^{}]+)}{([^{}]+)}/g, "($1)/($2)");
+            if (!expr.includes("\\frac{")) break;
+        }
+        for (let i = 0; i < 100; i++) {
+            expr = expr.replace(/\\sqrt{([^{}]+)}/g, "Math.sqrt($1)");
+            if (!expr.includes("\\sqrt{")) break;
+        }
+        for (let i = 0; i < 100; i++) {
+            expr = expr.replace(/\\left\|([^|]+)\\right\|/g, "Math.abs($1)");
+            if (!expr.includes("\\left|")) break;
+        }
+        return expr;
+    }
+
+    evalCalcVectBlock(match: Block, block: SubBlock): DiedricVector {
+        // let variableDeclaration = "";
+
+        // // Search in inputs
+        // Object.entries(block.inputs).map((input, index) => {
+        //     const a = match.inputs.find((_input) => _input.id == input[1][0]);
+
+        //     if (!a) return;
+
+        //     if (this._parsedParams[index] instanceof DiedricNumber) {
+        //         variableDeclaration += `let ${input[0]}=${this._parsedParams[index].x};`;
+        //     } else if (this._parsedParams[index] instanceof DiedricPoint) {
+        //         variableDeclaration += `let ${input[0]}={x:${this._parsedParams[index].r.x.x}, y:${this._parsedParams[index].r.y.x}, z:${this._parsedParams[index].r.z.x}};`;
+        //     } else {
+        //         console.warn("To implement");
+        //     }
+        // });
+
+        // // Search in blocks
+        // // TODO
+
+        let variableDeclaration = "";
+
+        // console.log("================= inputs =================");
+        match.inputs.map((inputObject, index) => {
+            Object.entries(block.inputs).map((input) => {
+                if (input[1][0] != inputObject.id) return;
+
+                let a: DiedricNumber | DiedricVector;
+
+                if (input[1][1] == "value") {
+                    let value: DiedricNumber | DiedricVector;
+
+                    // *************************************
+                    // ***************** Remove duplicate code ********************
+                    // *************************************
+
+                    if (inputObject.type == "calc") {
+                        value = this.evalCalcBlock(match, inputObject);
+                    } else if (inputObject.type == "crossVect") {
+                        value = this.evalCrossVect(match, inputObject);
+                    } else if (inputObject.type == "calcVect") {
+                        value = this.evalCalcVectBlock(match, inputObject);
+                    } else {
+                        console.warn("Unkwown block.type", inputObject.type);
+                    }
+
+                    // *************************************
+                    // *************************************
+                    // *************************************
+
+                    a = value;
+                } else {
+                    a = this._parsedParams[index][input[1][1]];
+                }
+                if (a instanceof DiedricVector) {
+                    variableDeclaration += `let ${input[0]}={x:${a.x.x}, y:${a.y.x}, z:${a.z.x}};`;
+                } else if (typeof a == "number") {
+                    variableDeclaration += `let ${input[0]}=${a};`;
+                } else {
+                    console.warn("To implement", a);
+                }
+            });
+        });
+
+        // console.log("================= blocks =================");
+        match.blocks.map((inputObject, index) => {
+            Object.entries(block.inputs).map((input) => {
+                if (input[1][0] != inputObject.id) return;
+
+                let a: DiedricNumber | DiedricVector;
+
+                if (input[1][1] == "value") {
+                    let value: DiedricNumber | DiedricVector;
+
+                    // *************************************
+                    // ***************** Remove duplicate code ********************
+                    // *************************************
+
+                    if (inputObject.type == "calc") {
+                        value = this.evalCalcBlock(match, inputObject);
+                    } else if (inputObject.type == "crossVect") {
+                        value = this.evalCrossVect(match, inputObject);
+                    } else if (inputObject.type == "calcVect") {
+                        value = this.evalCalcVectBlock(match, inputObject);
+                    } else {
+                        console.warn("Unkwown block.type", inputObject.type);
+                    }
+
+                    // *************************************
+                    // *************************************
+                    // *************************************
+
+                    a = value;
+                } else {
+                    a = this._parsedParams[index][input[1][1]];
+                }
+
+                if (a instanceof DiedricVector) {
+                    variableDeclaration += `let ${input[0]}={x:${a.x.x}, y:${a.y.x}, z:${a.z.x}};`;
+                } else if (typeof a == "number") {
+                    variableDeclaration += `let ${input[0]}=${a};`;
+                } else {
+                    console.warn("To implement", a);
+                }
+            });
+        });
+
+        return new DiedricVector({
+            x: new DiedricNumber({
+                x: eval(
+                    this.parseEvalExpression(
+                        variableDeclaration + block.outputs[0]
+                    )
+                ),
+            }),
+            y: new DiedricNumber({
+                x: eval(
+                    this.parseEvalExpression(
+                        variableDeclaration + block.outputs[1]
+                    )
+                ),
+            }),
+            z: new DiedricNumber({
+                x: eval(
+                    this.parseEvalExpression(
+                        variableDeclaration + block.outputs[2]
+                    )
+                ),
             }),
         });
     }
@@ -284,8 +524,12 @@ export class Expression {
         this.parseText();
 
         this._expressions.forEach((expression) => {
-            if (expression._params && expression._params.includes(oldName) && oldName != this._name) {
-                console.warn("Variable doesn't exist")
+            if (
+                expression._params &&
+                expression._params.includes(oldName) &&
+                oldName != this._name
+            ) {
+                console.warn("Variable doesn't exist");
                 expression.error = true;
             }
             if (expression._params && expression._params.includes(this._name)) {

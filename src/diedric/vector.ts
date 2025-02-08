@@ -39,6 +39,17 @@ export class DiedricVector {
         return this._z;
     }
 
+    normalize() {
+        const vectorModule = Math.sqrt(
+            this._x.x ** 2 + this._y.x ** 2 + this._z.x ** 2
+        );
+        this._x.x = this._x.x / vectorModule;
+        this._z.x = this._z.x / vectorModule;
+        this._y.x = this._y.x / vectorModule;
+
+        return this;
+    }
+
     delete() {
         console.warn("DiedricVector Implement delete");
     }
