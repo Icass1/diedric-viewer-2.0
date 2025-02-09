@@ -21,13 +21,21 @@ export class Canvas {
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
 
-        const cameraConfig = JSON.parse(localStorage.getItem("camera2d") || "");
+        let cameraConfig:
+            | { center: { x: number; y: number }; zoom: number }
+            | undefined;
+        try {
+            cameraConfig = JSON.parse(localStorage.getItem("camera2d") || "");
+        } catch {
+            console.error("Error parsing localStorage camera2d");
+        }
 
-        this.zoom = cameraConfig?.zoom || 2.1;
+        this.zoom = cameraConfig?.zoom || 1.1;
         this.center = new Vector2(
-            cameraConfig?.center?.x || this.canvas.width / 2,
-            cameraConfig?.center?.y || this.canvas.height / 2
+            cameraConfig?.center?.x || this.canvas.offsetWidth / 2,
+            cameraConfig?.center?.y || this.canvas.offsetHeight / 2
         );
+
         this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
         this.color = "rgb(200, 200, 200)";
 
