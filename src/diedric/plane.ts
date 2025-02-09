@@ -587,6 +587,13 @@ export class DiedricPlane {
         this.update();
     }
     delete() {
-        console.warn("DiedricPlane Implement delete");
+        this._diedric.scene.remove(this.horizontalProjectionLine);
+        this._diedric.scene.remove(this.verticalProjectionLine);
+        this._diedric.scene.remove(this.plane);
+
+        this._diedric.canvas2d.remove(this.horizontalProjectionLine2d);
+        this._diedric.canvas2d.remove(this.horizontalProjectionLine2dDashed);
+        this._diedric.canvas2d.remove(this.verticalProjectionLine2d);
+        this._diedric.canvas2d.remove(this.verticalProjectionLine2dDashed);
     }
 }

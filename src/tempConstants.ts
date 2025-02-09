@@ -129,24 +129,23 @@ export const blocks: Block[] = [
                 color: "red",
                 x: 10,
                 y: 10,
-                id: "input-point-1",
+                id: "input-line-1",
             },
             {
                 type: "DiedricLine",
                 color: "red",
                 x: 10,
                 y: 200,
-                id: "input-point-2",
+                id: "input-line-2",
             },
         ],
         blocks: [
             {
                 id: "fawefvawtr",
                 type: "crossVect",
-                outputs: ["r_1.x-r_2.x", "r_1.y - r_2.y", "r_1.z - r_2.z"],
                 inputs: {
-                    v_1: ["input-point-1", "v"],
-                    v_2: ["input-point-2", "v"],
+                    v_1: ["input-line-1", "v"],
+                    v_2: ["input-line-2", "v"],
                 },
                 color: "#fa7e19",
                 x: 200,
@@ -155,17 +154,18 @@ export const blocks: Block[] = [
             {
                 id: "umtzvotapk",
                 type: "calc",
-                outputs: ["v_1.x \\cdot r_1.x+v_1.y \\cdot r_1.y+v_1.z \\cdot r_1.z"],
+                outputs: [
+                    "v_1.x \\cdot r_1.x+v_1.y \\cdot r_1.y+v_1.z \\cdot r_1.z",
+                ],
                 inputs: {
                     v_1: ["fawefvawtr", "value"],
-                    r_1: ["input-point-2", "r"],
+                    r_1: ["input-line-2", "r"],
                 },
                 color: "#fa7e19",
                 x: 650,
                 y: 200,
             },
         ],
-
         outputs: [
             {
                 type: "DiedricPlane",
@@ -176,6 +176,96 @@ export const blocks: Block[] = [
                     d: ["umtzvotapk", "value"],
                 },
                 x: 1100,
+                y: 100,
+            },
+        ],
+    },
+    {
+        name: "Plane from three points",
+        inputs: [
+            {
+                type: "DiedricPoint",
+                color: "red",
+                x: 10,
+                y: 50,
+                id: "input-point-1",
+            },
+            {
+                type: "DiedricPoint",
+                color: "red",
+                x: 10,
+                y: 200,
+                id: "input-point-2",
+            },
+            {
+                type: "DiedricPoint",
+                color: "red",
+                x: 10,
+                y: 350,
+                id: "input-point-3",
+            },
+        ],
+        blocks: [
+            {
+                id: "calcVect-1",
+                type: "calcVect",
+                outputs: ["r_1.x-r_2.x", "r_1.y - r_2.y", "r_1.z - r_2.z"],
+                inputs: {
+                    r_1: ["input-point-1", "r"],
+                    r_2: ["input-point-2", "r"],
+                },
+                color: "#fa7e19",
+                x: 200,
+                y: 50,
+            },
+            {
+                id: "calcVect-2",
+                type: "calcVect",
+                outputs: ["r_1.x-r_2.x", "r_1.y - r_2.y", "r_1.z - r_2.z"],
+                inputs: {
+                    r_1: ["input-point-2", "r"],
+                    r_2: ["input-point-3", "r"],
+                },
+                color: "#fa7e19",
+                x: 200,
+                y: 200,
+            },
+            {
+                id: "crossVect-1",
+                type: "crossVect",
+                inputs: {
+                    v_1: ["calcVect-1", "value"],
+                    v_2: ["calcVect-2", "value"],
+                },
+                color: "#fa7e19",
+                x: 650,
+                y: 50,
+            },
+            {
+                id: "calc-1",
+                type: "calc",
+                outputs: [
+                    "v_1.x \\cdot r_1.x+v_1.y \\cdot r_1.y+v_1.z \\cdot r_1.z",
+                ],
+                inputs: {
+                    v_1: ["crossVect-1", "value"],
+                    r_1: ["input-point-3", "r"],
+                },
+                color: "#fa7e19",
+                x: 850,
+                y: 300,
+            },
+        ],
+        outputs: [
+            {
+                type: "DiedricPlane",
+                id: "output-line-1",
+                color: "#c74440",
+                inputs: {
+                    v: ["crossVect-1", "value"],
+                    d: ["calc-1", "value"],
+                },
+                x: 1300,
                 y: 100,
             },
         ],

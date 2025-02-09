@@ -36,12 +36,12 @@ export class Diedric {
         window.addEventListener("resize", () => {
             if (canvas2d.parentNode && canvas3d.parentNode) {
                 this.renderer.setSize(
-                    canvas3d.offsetWidth,
-                    canvas3d.offsetHeight
+                    canvas3d.parentElement.offsetWidth,
+                    canvas3d.parentElement.offsetHeight
                 );
                 this.canvas2d.setSize(
-                    canvas2d.offsetWidth,
-                    canvas2d.offsetHeight
+                    canvas2d.parentElement.offsetWidth,
+                    canvas2d.parentElement.offsetHeight
                 );
 
                 this.camera.aspect =

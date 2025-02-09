@@ -35,7 +35,7 @@ function App() {
     const canvas2dRef = useRef<HTMLCanvasElement>(null);
     const [diedric, setDiedric] = useState<Diedric>();
 
-    const [block, setBlock] = useState<Block | undefined>(blocks[2]);
+    const [block, setBlock] = useState<Block | undefined>(blocks[3]);
 
     useEffect(() => {
         if (!currentTab) return;
@@ -91,6 +91,7 @@ function App() {
                 diedric: diedric,
             })
         );
+
         expressions.current.push(
             new Expression({
                 text: "D = -35",
@@ -135,42 +136,21 @@ function App() {
         );
         expressions.current.push(
             new Expression({
-                text: "J = (A, B, C)",
+                text: "J = (A,\\ B,\\ C)",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "K = (D, E, F)",
+                text: "K = (D,\\ E,\\ F)",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "M = (G, H, I)",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        // expressions.current.push(
-        //     new Expression({
-        //         text: "t = (J, K)",
-        //         expressions: expressions.current,
-        //         diedric: diedric,
-        //     })
-        // );
-        expressions.current.push(
-            new Expression({
-                text: "s = (K, M)",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "u = (J, M)",
+                text: "M = (G,\\ H,\\ I)",
                 expressions: expressions.current,
                 diedric: diedric,
             })
@@ -178,11 +158,41 @@ function App() {
 
         expressions.current.push(
             new Expression({
-                text: "alpha = (s, u)",
+                text: "\\beta = (J,\\ K,\\ M)",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
+
+        // expressions.current.push(
+        //     new Expression({
+        //         text: "t = (J,\\ K)",
+        //         expressions: expressions.current,
+        //         diedric: diedric,
+        //     })
+        // );
+        // expressions.current.push(
+        //     new Expression({
+        //         text: "s = (K,\\ M)",
+        //         expressions: expressions.current,
+        //         diedric: diedric,
+        //     })
+        // );
+        // expressions.current.push(
+        //     new Expression({
+        //         text: "u = (J,\\ M)",
+        //         expressions: expressions.current,
+        //         diedric: diedric,
+        //     })
+        // );
+
+        // expressions.current.push(
+        //     new Expression({
+        //         text: "\\alpha = (s,\\ u)",
+        //         expressions: expressions.current,
+        //         diedric: diedric,
+        //     })
+        // );
         updater();
     }, [expressions, diedric]);
 

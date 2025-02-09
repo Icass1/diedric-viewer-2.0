@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Expression } from "./expression";
 import { DiedricNumber } from "./diedric/number";
+import { addStyles, EditableMathField, StaticMathField } from "react-mathquill";
+
+addStyles();
 
 export function ExpressionRender({ expression }: { expression: Expression }) {
-    const [text, setText] = useState(expression.text);
+    const [latex, setLatex] = useState(expression.text);
 
     let tempSliderValue = undefined;
 
@@ -15,6 +18,9 @@ export function ExpressionRender({ expression }: { expression: Expression }) {
     }
 
     const [sliderValue, setSliderValue] = useState(tempSliderValue);
+
+    const [sliderMin, setSliderMin] = useState(Math.min(sliderValue, -100));
+    const [sliderMax, setSliderMax] = useState(Math.max(sliderValue, 100));
 
     const [error, setError] = useState<boolean>(expression.error);
     useEffect(() => {
@@ -29,29 +35,33 @@ export function ExpressionRender({ expression }: { expression: Expression }) {
                 "bg-neutral-300 p-2 rounded " + (error ? " bg-red-400 " : " ")
             }
         >
-            <input
-                value={text}
-                onChange={(e) => {
-                    setText(e.currentTarget.value);
-                    expression.text = e.currentTarget.value;
+            <EditableMathField
+                id="react-mathquill-styles"
+                latex={latex}
+                onChange={(mathField) => {
+                    console.log(mathField);
+                    setLatex(mathField.latex());
+                    expression.text = mathField.latex();
                     if (
                         expression.values.length == 1 &&
                         expression.values[0] instanceof DiedricNumber
                     ) {
                         setSliderValue(expression.values[0].x);
+                        setSliderMin(Math.min(expression.values[0].x, -100));
+                        setSliderMax(Math.max(expression.values[0].x, 100));
                     }
                 }}
-                className="bg-neutral-300 focus:outline-none border-b-2 w-full border-neutral-600 border-solid"
             />
 
             {(sliderValue == 0 || sliderValue) && (
-                <div className="flex flex-row items-center">
-                    <label>-10</label>
+                <div className="flex flex-row items-center gap-x-1 px-1">
+                    <StaticMathField>{sliderMin.toString()}</StaticMathField>
                     <input
                         type="range"
-                        min={-100}
-                        max={100}
+                        min={sliderMin}
+                        max={sliderMax}
                         value={sliderValue}
+                        className="w-full"
                         onChange={(e) => {
                             setSliderValue(Number(e.currentTarget.value));
 
@@ -59,16 +69,16 @@ export function ExpressionRender({ expression }: { expression: Expression }) {
                                 expression.values.length == 1 &&
                                 expression.values[0] instanceof DiedricNumber
                             ) {
-                                const newText = text.replace(
+                                const newText = latex.replace(
                                     expression.values[0].x.toString(),
                                     e.currentTarget.value
                                 );
-                                setText(newText);
+                                setLatex(newText);
                                 expression.text = newText;
                             }
                         }}
-                    ></input>
-                    <label>10</label>
+                    />
+                    <StaticMathField>{sliderMax.toString()}</StaticMathField>
                 </div>
             )}
         </div>

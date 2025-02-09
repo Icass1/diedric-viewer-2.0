@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { Block, objects, SubBlock } from "./tempConstants";
-import EquationEditor from "equation-editor-react";
+import { EditableMathField } from "react-mathquill";
+
 function BlockInput({ input }: { input: SubBlock }) {
     return (
         <div
@@ -53,11 +54,10 @@ function BlockBlock({ block }: { block: SubBlock }) {
                                 key={"input-param-" + index}
                                 className="line-connector in bg-black/15 rounded-r-lg p-1 w-[70px] text-left px-2"
                             >
-                                <EquationEditor
-                                    value={input[0]}
+                                <EditableMathField
+                                    id="blockbuilder-mathquill-styles"
+                                    latex={input[0]}
                                     onChange={() => {}}
-                                    autoCommands={"pi"}
-                                    autoOperatorNames={"sin"}
                                 />
                             </label>
                         );
@@ -69,16 +69,19 @@ function BlockBlock({ block }: { block: SubBlock }) {
                         id={block.id + "-value"}
                         className="line-connector out bg-black/15 rounded-l-lg p-1  text-right px-2"
                     >
-                        <EquationEditor
-                            value={
-                                "\\left(" +
-                                block.outputs.join(",\\ \\ ") +
-                                "\\right)"
-                            }
-                            onChange={() => {}}
-                            autoCommands="pi theta sqrt sum prod alpha beta gamma rho"
-                            autoOperatorNames="sin cos tan"
-                        />
+                        {block.outputs ? (
+                            <EditableMathField
+                                id="blockbuilder-mathquill-styles"
+                                latex={
+                                    "\\left(" +
+                                    block.outputs.join(",\\ \\ ") +
+                                    "\\right)"
+                                }
+                                onChange={() => {}}
+                            />
+                        ) : (
+                            "Out"
+                        )}
                     </label>
                 </div>
             </div>
@@ -128,9 +131,7 @@ export function BlockBuilder({ block }: { block: Block }) {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    useLayoutEffect(() => {
-        if (!canvasRef.current) return;
-
+    const a = () => {
         const ctx = canvasRef.current.getContext("2d");
         if (!ctx) return;
         ctx.strokeStyle = "black";
@@ -176,6 +177,14 @@ export function BlockBuilder({ block }: { block: Block }) {
                         ctx.stroke();
                     });
             });
+    };
+
+    useLayoutEffect(() => {
+        if (!canvasRef.current) return;
+
+        setTimeout(() => {
+            a();
+        }, 100);
     }, [canvasRef, block]);
 
     return (
@@ -193,7 +202,7 @@ export function BlockBuilder({ block }: { block: Block }) {
                             <BlockInput
                                 key={"input-" + index + "-" + block.name}
                                 input={input}
-                            ></BlockInput>
+                            />
                         );
                     })}
 
