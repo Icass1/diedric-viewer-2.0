@@ -47,13 +47,11 @@ export class DiedricLine {
         this._diedric.scene.add(this.cylinder);
 
         this.horizontalProjectionLine2d = new TWO.Line({
-            color: "blue",
-            // color: color.toString(),
+            color: color.toString(),
             width: 1,
         });
         this.verticalProjectionLine2d = new TWO.Line({
-            color: "red",
-            // color: color.toString(),
+            color: color.toString(),
             width: 1,
         });
         this._diedric.canvas2d.add(this.horizontalProjectionLine2d);

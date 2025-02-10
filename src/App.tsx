@@ -86,50 +86,49 @@ function App() {
         );
         expressions.current.push(
             new Expression({
-                text: "C = -35",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-
-        expressions.current.push(
-            new Expression({
-                text: "D = -35",
+                text: "C = -135",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "E = -35",
+                text: "D = -135",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "F = -35",
+                text: "E = -135",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "G = -132",
+                text: "F = 16",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "H = 100",
+                text: "G = 56",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
         expressions.current.push(
             new Expression({
-                text: "I = 34",
+                text: "H = -100",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
+        expressions.current.push(
+            new Expression({
+                text: "I = 32",
                 expressions: expressions.current,
                 diedric: diedric,
             })
@@ -164,13 +163,13 @@ function App() {
             })
         );
 
-        // expressions.current.push(
-        //     new Expression({
-        //         text: "t = (J,\\ K)",
-        //         expressions: expressions.current,
-        //         diedric: diedric,
-        //     })
-        // );
+        expressions.current.push(
+            new Expression({
+                text: "t = (J,\\ K)",
+                expressions: expressions.current,
+                diedric: diedric,
+            })
+        );
         // expressions.current.push(
         //     new Expression({
         //         text: "s = (K,\\ M)",

@@ -1,6 +1,7 @@
 import { Diedric } from "./diedric";
 import { DiedricVector } from "./vector";
 import * as THREE from "three";
+import * as TWO from "../two/two";
 
 export class DiedricPoint {
     type = "DiedricPoint";
@@ -31,12 +32,19 @@ export class DiedricPoint {
         THREE.Object3DEventMap
     >;
 
-    private lineToY0Geometry;
-    private lineToX0Geometry;
-    private lineToZ0Geometry;
+    private horizontalProjection: TWO.Point;
+    private verticalProjection: TWO.Point;
+    private horizontalProjectionLabel: TWO.Label;
+    private verticalProjectionLabel: TWO.Label;
+
+    private lineToY0Geometry: THREE.BufferGeometry;
+    private lineToX0Geometry: THREE.BufferGeometry;
+    private lineToZ0Geometry: THREE.BufferGeometry;
 
     constructor({ r, diedric }: { r: DiedricVector; diedric: Diedric }) {
         this._diedric = diedric;
+
+        const color = "orange";
 
         const lineMaterial = new THREE.LineDashedMaterial({
             color: "black",
@@ -57,7 +65,7 @@ export class DiedricPoint {
 
         const geometry = new THREE.SphereGeometry(1);
         this.material = new THREE.MeshBasicMaterial({
-            color: "red",
+            color: color,
             side: THREE.DoubleSide,
         });
 
@@ -68,9 +76,29 @@ export class DiedricPoint {
         this._diedric.scene.add(this.lineToY0Line);
         this._diedric.scene.add(this.lineToZ0Line);
 
-        this.bPoint.position.x = 6;
-        this.bPoint.position.y = 2;
-        this.bPoint.position.z = 7;
+        this.verticalProjection = new TWO.Point({
+            radius: 3,
+            color: color.toString(),
+        });
+        this.horizontalProjection = new TWO.Point({
+            radius: 3,
+            color: color.toString(),
+        });
+
+        this._diedric.canvas2d.add(this.verticalProjection);
+        this._diedric.canvas2d.add(this.horizontalProjection);
+
+        this.verticalProjectionLabel = new TWO.Label({
+            text: "",
+            color: color,
+        });
+        this.horizontalProjectionLabel = new TWO.Label({
+            text: "",
+            color: color,
+        });
+
+        this._diedric.canvas2d.add(this.verticalProjectionLabel);
+        this._diedric.canvas2d.add(this.horizontalProjectionLabel);
 
         this.r = r;
     }
@@ -96,11 +124,23 @@ export class DiedricPoint {
         this.lineToY0Line.computeLineDistances();
         this.lineToZ0Line.computeLineDistances();
 
+        this.verticalProjection.pos = new THREE.Vector2(newR.x.x, -newR.y.x);
+        this.horizontalProjection.pos = new THREE.Vector2(newR.x.x, newR.z.x);
+
+        this.verticalProjectionLabel.pos = new THREE.Vector2(
+            newR.x.x,
+            -newR.y.x
+        );
+        this.horizontalProjectionLabel.pos = new THREE.Vector2(
+            newR.x.x,
+            newR.z.x
+        );
+
         this._r = newR;
     }
 
     get r() {
-        return this._r
+        return this._r;
     }
 
     delete() {
@@ -109,6 +149,12 @@ export class DiedricPoint {
         this._diedric.scene.remove(this.lineToY0Line);
         this._diedric.scene.remove(this.lineToZ0Line);
 
-        console.warn("DiedricPoint Implement delete");
+        this._diedric.canvas2d.remove(this.verticalProjection);
+        this._diedric.canvas2d.remove(this.horizontalProjection);
+
+        this._diedric.canvas2d.remove(this.verticalProjectionLabel);
+        this._diedric.canvas2d.remove(this.horizontalProjectionLabel);
+
+        // console.warn("DiedricPoint Implement delete");
     }
 }

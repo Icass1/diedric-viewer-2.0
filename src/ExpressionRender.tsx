@@ -19,8 +19,8 @@ export function ExpressionRender({ expression }: { expression: Expression }) {
 
     const [sliderValue, setSliderValue] = useState(tempSliderValue);
 
-    const [sliderMin, setSliderMin] = useState(Math.min(sliderValue, -100));
-    const [sliderMax, setSliderMax] = useState(Math.max(sliderValue, 100));
+    const [sliderMin, setSliderMin] = useState(Math.min(sliderValue, -200));
+    const [sliderMax, setSliderMax] = useState(Math.max(sliderValue, 200));
 
     const [error, setError] = useState<boolean>(expression.error);
     useEffect(() => {
@@ -47,8 +47,8 @@ export function ExpressionRender({ expression }: { expression: Expression }) {
                         expression.values[0] instanceof DiedricNumber
                     ) {
                         setSliderValue(expression.values[0].x);
-                        setSliderMin(Math.min(expression.values[0].x, -100));
-                        setSliderMax(Math.max(expression.values[0].x, 100));
+                        setSliderMin(Math.min(expression.values[0].x, -200));
+                        setSliderMax(Math.max(expression.values[0].x, 200));
                     }
                 }}
             />
