@@ -37,9 +37,9 @@ body {
 #react-mathquill-styles {
     width: 100%;
     border: 0px;
-    border-bottom: 2px;
-    border-style: solid;
-    border-color: rgb(141, 138, 138);
+    /* border-bottom: 2px; */
+    /* border-style: solid; */
+    /* border-color: rgb(141, 138, 138); */
     box-shadow: none;
 }
 

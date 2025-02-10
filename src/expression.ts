@@ -55,13 +55,16 @@ export class Expression {
     }
 
     parseText() {
-        const match = this._text
-            .replaceAll("\\", "")
-            .match(
-                /^([A-Za-z_][A-Za-z0-9_]*)?\s*=?\s*\(([^)]*)\)|^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(\S+)$/
-            );
+        const replacedText = this._text
+            .replaceAll("\\ ", "")
+            .replaceAll("\\left", "")
+            .replaceAll("\\right", "");
+
+        const match = replacedText.match(
+            /^([A-Za-z_][A-Za-z0-9_]*)?\s*=?\s*\(([^)]*)\)|^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(\S+)$/
+        );
         if (!match) {
-            console.warn("Syntax error");
+            console.warn("Syntax error", this._text, replacedText);
             this.error = true;
             return;
         }

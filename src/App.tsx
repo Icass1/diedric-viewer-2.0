@@ -9,6 +9,7 @@ import { Block, blocks } from "./tempConstants";
 
 function App() {
     const expressions = useRef<Expression[]>([]);
+    const [newExpression, setNewExpression] = useState<Expression>();
     const [, updater] = useReducer((x) => x + 1, 0);
 
     const [currentTab, setCurrentTab] = useState<
@@ -70,140 +71,84 @@ function App() {
         if (!diedric) return;
         if (!expressions) return;
 
-        expressions.current.push(
-            new Expression({
-                text: "A = 10",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
+        const expressionsText = [
+            "A=-21",
+            "B=117",
+            "C=3",
+            "p=\\left(A,\\ B,\\ C\\right)",
+            "b=\\left(C,\\ A,\\ B\\right)",
+            "s=\\left(p,\\ b\\right)",
+        ];
+
+        expressionsText.map((text) =>
+            expressions.current.push(
+                new Expression({
+                    text: text,
+                    expressions: expressions.current,
+                    diedric: diedric,
+                })
+            )
         );
-        expressions.current.push(
+
+        setNewExpression(
             new Expression({
-                text: "B = 55",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "C = -135",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "D = -135",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "E = -135",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "F = 16",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "G = 56",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "H = -100",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "I = 32",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "J = (A,\\ B,\\ C)",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "K = (D,\\ E,\\ F)",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        expressions.current.push(
-            new Expression({
-                text: "M = (G,\\ H,\\ I)",
+                text: "",
                 expressions: expressions.current,
                 diedric: diedric,
             })
         );
 
-        expressions.current.push(
-            new Expression({
-                text: "\\beta = (J,\\ K,\\ M)",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-
-        expressions.current.push(
-            new Expression({
-                text: "t = (J,\\ K)",
-                expressions: expressions.current,
-                diedric: diedric,
-            })
-        );
-        // expressions.current.push(
-        //     new Expression({
-        //         text: "s = (K,\\ M)",
-        //         expressions: expressions.current,
-        //         diedric: diedric,
-        //     })
-        // );
-        // expressions.current.push(
-        //     new Expression({
-        //         text: "u = (J,\\ M)",
-        //         expressions: expressions.current,
-        //         diedric: diedric,
-        //     })
-        // );
-
-        // expressions.current.push(
-        //     new Expression({
-        //         text: "\\alpha = (s,\\ u)",
-        //         expressions: expressions.current,
-        //         diedric: diedric,
-        //     })
-        // );
         updater();
     }, [expressions, diedric]);
 
     return (
         <div className="grid grid-cols-[300px_1fr] h-full">
-            <div className="bg-indigo-900 flex flex-col p-2 gap-y-2 overflow-y-auto ">
-                {expressions.current.map((expression, index) => (
-                    <ExpressionRender
-                        key={"expression-" + index}
-                        expression={expression}
-                    />
-                ))}
+            <div className="bg-white border-r border-[#d7d7d7] border-solid">
+                <div className="w-full h-10 bg-gradient-to-b from-[#fcfcfc] to-[#ebebeb] border-b border-[#cacaca]">
+                    <button className="p-1 bg-neutral-400 rounded">
+                        Plus icon
+                    </button>
+                    <button
+                        className="p-1 bg-neutral-400 rounded"
+                        onClick={() => {
+                            console.log(
+                                expressions.current.map((expr) => expr.text)
+                            );
+                        }}
+                    >
+                        Save
+                    </button>
+                </div>
+                <div className="flex flex-col  overflow-y-auto ">
+                    {expressions.current.map((expression, index) => (
+                        <ExpressionRender
+                            key={"expression-" + index}
+                            index={index}
+                            expression={expression}
+                        />
+                    ))}
+                    <div
+                        className="relative"
+                        onClick={() => {
+                            expressions.current.push(
+                                new Expression({
+                                    text: "",
+                                    expressions: expressions.current,
+                                    diedric: diedric,
+                                })
+                            );
+                            updater();
+                        }}
+                    >
+                        {newExpression && (
+                            <ExpressionRender
+                                index={expressions.current.length}
+                                expression={newExpression}
+                            />
+                        )}
+                        <div className="w-full h-full absolute bg-gradient-to-b from-transparent to-white top-0"></div>
+                    </div>
+                </div>
             </div>
             <div className="flex flex-col">
                 <div className="flex flex-row gap-x-2 p-1">
