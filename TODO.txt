@@ -1,0 +1,17 @@
+MEDIUM - Add color selector to expression render
+MEDIUM - Change color in expression and diedric object when color is changed in expression render
+LOW - Add folders for expressions
+LOW - Add DiedricSegment
+MEDIUM - Point expression with three numbers and three sliders
+HIGH - BlockBuilder
+  Infinite canvas (drag with cursor to move arround)
+  Move blocks
+  Connect blocks
+  Check connections
+  Save block (JSON to localStorage)
+  Add download blocks button (downloads localStorage JSON)
+  Import blocks button
+
+HIGH - Save expressions
+  Name
+  JSON with a list
