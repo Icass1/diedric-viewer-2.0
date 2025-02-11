@@ -5,8 +5,9 @@ import { viteSingleFile } from "vite-plugin-singlefile";
 export default defineConfig({
     plugins: [viteSingleFile()],
     server: {
-        host: "localhost",
+        host: "",
         port: 3000,
+        allowedHosts: ["proxy.3000.vscode.rockhosting.org"],
     },
     css: {
         postcss: {
