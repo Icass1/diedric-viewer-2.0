@@ -3,6 +3,7 @@ import { DiedricLine } from "./diedric/line";
 import { DiedricNumber } from "./diedric/number";
 import { DiedricPlane } from "./diedric/plane";
 import { DiedricPoint } from "./diedric/point";
+import { DiedricSegment } from "./diedric/segment";
 import { DiedricVector } from "./diedric/vector";
 import { Block, blocks, objects, SubBlock } from "./tempConstants";
 import { compareArrays } from "./utils/compareArrays";
@@ -20,6 +21,7 @@ export class Expression {
         | DiedricPlane
         | DiedricPoint
         | DiedricLine
+        | DiedricSegment
     )[] = [];
     private _name: string | undefined;
     private _params: (string | number)[];
@@ -36,6 +38,7 @@ export class Expression {
         | DiedricPlane
         | DiedricPoint
         | DiedricLine
+        | DiedricSegment
     )[];
     private _diedric: Diedric;
 
@@ -140,15 +143,16 @@ export class Expression {
                 return;
             }
 
-            if (matches.length > 1) {
-                console.warn("Mutiple matches is not supported");
-                console.log(matches);
-                this.error = true;
-                return;
-            }
+            // if (matches.length > 1) {
+            //     console.warn("Multiple matches is not supported");
+            //     console.log(matches);
+            //     this.error = true;
+            //     return;
+            // }
 
-            const match = matches[0]; // Temporary get always first match
-
+            const match =
+                matches.find((match) => match.name == "Segment") ?? matches[0]; // Temporary get always first match
+                
             // If there are multiple outputs, the expression cannot be set to a variable. Until lists are implemented.
             if (match.outputs.length > 1 && this._name) {
                 console.warn(
@@ -197,7 +201,6 @@ export class Expression {
                             block
                         );
                     } else if (
-                        block.type == "DiedricPoint" &&
                         this._parsedParams[index] instanceof DiedricPoint
                     ) {
                         // TODO - This condition has to be checked with other examples
@@ -220,6 +223,7 @@ export class Expression {
                         valueToUpdate[param[0]] = param[1];
                     });
                 } else {
+                    console.log("parsedInputs", parsedInputs);
                     // console.log("New object created");
                     // @ts-expect-error Extremely hard to type parsedInputs.
                     const newValue = new objects[output.type].prototype({

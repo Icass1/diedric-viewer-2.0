@@ -2,6 +2,7 @@ import { DiedricLine } from "./diedric/line";
 import { DiedricNumber } from "./diedric/number";
 import { DiedricPlane } from "./diedric/plane";
 import { DiedricPoint } from "./diedric/point";
+import { DiedricSegment } from "./diedric/segment";
 import { DiedricVector } from "./diedric/vector";
 
 export interface SubBlock {
@@ -270,6 +271,40 @@ export const blocks: Block[] = [
             },
         ],
     },
+
+    {
+        name: "Segment",
+        inputs: [
+            {
+                type: "DiedricPoint",
+                color: "red",
+                x: 10,
+                y: 10,
+                id: "input-point-1",
+            },
+            {
+                type: "DiedricPoint",
+                color: "red",
+                x: 10,
+                y: 100,
+                id: "input-point-2",
+            },
+        ],
+        outputs: [
+            {
+                type: "DiedricSegment",
+                id: "output-line-1",
+                color: "#c74440",
+                inputs: {
+                    r1: ["input-point-1", "r"],
+                    r2: ["input-point-2", "r"],
+                },
+                x: 700,
+                y: 30,
+            },
+        ],
+        blocks: [],
+    },
 ];
 
 export const objects: {
@@ -279,6 +314,7 @@ export const objects: {
             | typeof DiedricVector
             | typeof DiedricPlane
             | typeof DiedricLine
+            | typeof DiedricSegment
             | typeof DiedricPoint;
         params: { [key: string]: "DiedricNumber" | "DiedricVector" };
     };
@@ -315,6 +351,13 @@ export const objects: {
         prototype: DiedricPoint,
         params: {
             r: "DiedricVector",
+        },
+    },
+    DiedricSegment: {
+        prototype: DiedricSegment,
+        params: {
+            p1: "DiedricVector",
+            p2: "DiedricVector",
         },
     },
 };
