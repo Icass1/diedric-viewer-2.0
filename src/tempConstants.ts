@@ -8,9 +8,8 @@ import { DiedricVector } from "./diedric/vector";
 export interface SubBlock {
     type: string;
     id: string;
-    color: string;
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
     outputs?: string[];
     inputs?: { [key: string]: [string, string] };
 }
@@ -29,21 +28,18 @@ export const blocks: Block[] = [
             {
                 type: "DiedricNumber",
                 id: "MhHXZzLv",
-                color: "#2d70b3",
                 x: 10,
                 y: 50,
             },
             {
                 type: "DiedricNumber",
                 id: "jfUkvEjp",
-                color: "#2d70b3",
                 x: 10,
                 y: 150,
             },
             {
                 type: "DiedricNumber",
                 id: "FbQQmwoW",
-                color: "#2d70b3",
                 x: 10,
                 y: 250,
             },
@@ -58,7 +54,6 @@ export const blocks: Block[] = [
                     y: ["jfUkvEjp", "x"],
                     z: ["FbQQmwoW", "x"],
                 },
-                color: "#fa7e19",
                 x: 250,
                 y: 30,
             },
@@ -67,7 +62,6 @@ export const blocks: Block[] = [
             {
                 type: "DiedricPoint",
                 id: "PclobZUk",
-                color: "#c74440",
                 inputs: {
                     r: ["fawefvawtr", "value"],
                 },
@@ -81,14 +75,12 @@ export const blocks: Block[] = [
         inputs: [
             {
                 type: "DiedricPoint",
-                color: "red",
                 x: 10,
                 y: 10,
                 id: "input-point-1",
             },
             {
                 type: "DiedricPoint",
-                color: "red",
                 x: 10,
                 y: 100,
                 id: "input-point-2",
@@ -98,7 +90,6 @@ export const blocks: Block[] = [
             {
                 type: "DiedricLine",
                 id: "output-line-1",
-                color: "#c74440",
                 inputs: {
                     r: ["input-point-1", "r"],
                     v: ["fawefvawtr", "value"],
@@ -116,7 +107,6 @@ export const blocks: Block[] = [
                     r_1: ["input-point-1", "r"],
                     r_2: ["input-point-2", "r"],
                 },
-                color: "#fa7e19",
                 x: 250,
                 y: 100,
             },
@@ -127,14 +117,12 @@ export const blocks: Block[] = [
         inputs: [
             {
                 type: "DiedricLine",
-                color: "red",
                 x: 10,
                 y: 10,
                 id: "input-line-1",
             },
             {
                 type: "DiedricLine",
-                color: "red",
                 x: 10,
                 y: 200,
                 id: "input-line-2",
@@ -148,7 +136,6 @@ export const blocks: Block[] = [
                     v_1: ["input-line-1", "v"],
                     v_2: ["input-line-2", "v"],
                 },
-                color: "#fa7e19",
                 x: 200,
                 y: 50,
             },
@@ -162,7 +149,6 @@ export const blocks: Block[] = [
                     v_1: ["fawefvawtr", "value"],
                     r_1: ["input-line-2", "r"],
                 },
-                color: "#fa7e19",
                 x: 650,
                 y: 200,
             },
@@ -171,7 +157,6 @@ export const blocks: Block[] = [
             {
                 type: "DiedricPlane",
                 id: "output-line-1",
-                color: "#c74440",
                 inputs: {
                     v: ["fawefvawtr", "value"],
                     d: ["umtzvotapk", "value"],
@@ -186,21 +171,18 @@ export const blocks: Block[] = [
         inputs: [
             {
                 type: "DiedricPoint",
-                color: "red",
                 x: 10,
                 y: 50,
                 id: "input-point-1",
             },
             {
                 type: "DiedricPoint",
-                color: "red",
                 x: 10,
                 y: 200,
                 id: "input-point-2",
             },
             {
                 type: "DiedricPoint",
-                color: "red",
                 x: 10,
                 y: 350,
                 id: "input-point-3",
@@ -215,7 +197,6 @@ export const blocks: Block[] = [
                     r_1: ["input-point-1", "r"],
                     r_2: ["input-point-2", "r"],
                 },
-                color: "#fa7e19",
                 x: 200,
                 y: 50,
             },
@@ -227,7 +208,6 @@ export const blocks: Block[] = [
                     r_1: ["input-point-2", "r"],
                     r_2: ["input-point-3", "r"],
                 },
-                color: "#fa7e19",
                 x: 200,
                 y: 200,
             },
@@ -238,7 +218,6 @@ export const blocks: Block[] = [
                     v_1: ["calcVect-1", "value"],
                     v_2: ["calcVect-2", "value"],
                 },
-                color: "#fa7e19",
                 x: 650,
                 y: 50,
             },
@@ -252,7 +231,6 @@ export const blocks: Block[] = [
                     v_1: ["crossVect-1", "value"],
                     r_1: ["input-point-3", "r"],
                 },
-                color: "#fa7e19",
                 x: 850,
                 y: 300,
             },
@@ -261,7 +239,6 @@ export const blocks: Block[] = [
             {
                 type: "DiedricPlane",
                 id: "output-line-1",
-                color: "#c74440",
                 inputs: {
                     v: ["crossVect-1", "value"],
                     d: ["calc-1", "value"],
@@ -277,14 +254,12 @@ export const blocks: Block[] = [
         inputs: [
             {
                 type: "DiedricPoint",
-                color: "red",
                 x: 10,
                 y: 10,
                 id: "input-point-1",
             },
             {
                 type: "DiedricPoint",
-                color: "red",
                 x: 10,
                 y: 100,
                 id: "input-point-2",
@@ -294,7 +269,6 @@ export const blocks: Block[] = [
             {
                 type: "DiedricSegment",
                 id: "output-line-1",
-                color: "#c74440",
                 inputs: {
                     r1: ["input-point-1", "r"],
                     r2: ["input-point-2", "r"],

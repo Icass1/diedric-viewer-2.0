@@ -8,11 +8,22 @@ import { DiedricVector } from "./diedric/vector";
 import { Block, blocks, objects, SubBlock } from "./tempConstants";
 import { compareArrays } from "./utils/compareArrays";
 
-interface ExpressionListener {
-    delete: (() => void)[];
-    update: (() => void)[];
-    errorUpdate: ((e: boolean) => void)[];
+// interface ExpressionListener {
+//     delete: (() => void)[];
+//     update: (() => void)[];
+//     errorUpdate: ((e: boolean) => void)[];
+// }
+
+interface ExpressionListenerParams {
+    eventType?: string;
+    matches?: string[];
+    currentMatch?: string;
+    error?: boolean;
+    errorMsg?: string;
 }
+
+type ExpressionListenerCallback = (e: ExpressionListenerParams) => void;
+
 export class Expression {
     private _text: string = "";
     private _values: (
@@ -27,10 +38,17 @@ export class Expression {
     private _params: (string | number)[];
     private _expressions: Expression[];
     private _error: boolean = true;
-    private _listeners: ExpressionListener = {
+    private _preferredMatch: string;
+    private _listeners: {
+        delete: ExpressionListenerCallback[];
+        update: ExpressionListenerCallback[];
+        errorUpdate: ExpressionListenerCallback[];
+        multipleMatches: ExpressionListenerCallback[];
+    } = {
         delete: [],
         update: [],
         errorUpdate: [],
+        multipleMatches: [],
     };
     private _parsedParams: (
         | DiedricVector
@@ -41,20 +59,42 @@ export class Expression {
         | DiedricSegment
     )[];
     private _diedric: Diedric;
+    id: string;
 
     constructor({
         text,
         expressions,
         diedric,
+        preferredMatch,
     }: {
         text?: string;
         expressions: Expression[];
         diedric: Diedric;
+        preferredMatch?: string;
     }) {
+        const S4 = function () {
+            return (((1 + Math.random()) * 0x10000) | 0)
+                .toString(16)
+                .substring(1);
+        };
+        this.id =
+            S4() +
+            S4() +
+            "-" +
+            S4() +
+            "-" +
+            S4() +
+            "-" +
+            S4() +
+            "-" +
+            S4() +
+            S4() +
+            S4();
+
         this._text = text ?? "";
         this._expressions = expressions;
         this._diedric = diedric;
-        this.parseText();
+        this._preferredMatch = preferredMatch;
     }
 
     parseText() {
@@ -63,18 +103,18 @@ export class Expression {
             .replaceAll("\\left", "")
             .replaceAll("\\right", "");
 
-        const match = replacedText.match(
+        const textMatch = replacedText.match(
             /^([A-Za-z_][A-Za-z0-9_]*)?\s*=?\s*\(([^)]*)\)|^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(\S+)$/
         );
-        if (!match) {
+        if (!textMatch) {
             console.warn("Syntax error", this._text, replacedText);
             this.error = true;
             return;
         }
         this.error = false;
 
-        this._name = match[1] || match[3];
-        this._params = this.parseParams(match[2] || match[4]);
+        this._name = textMatch[1] || textMatch[3];
+        this._params = this.parseParams(textMatch[2] || textMatch[4]);
 
         // Check special case where the expression is only a number.
         if (this._params.length == 1 && typeof this._params[0] == "number") {
@@ -88,158 +128,167 @@ export class Expression {
                     new DiedricNumber({ x: Number(this._params[0]) }),
                 ];
             }
-        } else {
-            this._parsedParams = this._params.map((param) => {
-                const result = this._expressions.find(
-                    (expression) => expression._name == param
-                );
-                if (result?._values.length == 1) {
-                    return result?._values[0];
-                } else {
-                    console.error(
-                        "this._parsedParams = this._params.map should not be more than one"
-                    );
-                }
-            });
-            // If a parsed parameter is undefined because the expression doesn't exists or exists but it's value is undefined, set error to true.
-            if (this._parsedParams.includes(undefined)) {
-                console.warn("There is a _parsedParams that is undefined");
-
-                this.error = true;
-
-                this._expressions.forEach((expression) => {
-                    if (
-                        expression._params &&
-                        expression._params.includes(this._name)
-                    ) {
-                        expression.parseText();
-                    }
-                });
-                return;
-            }
-
-            const parsedParamsTypesSorted = this._parsedParams.map(
-                (param) => param.type
-            );
-            parsedParamsTypesSorted.sort();
-
-            // Get matches by getting the blocks that have the same inputs as the parameters in the text.
-            const matches = blocks.filter((block) => {
-                const blockInputTypesSorted = block.inputs.map(
-                    (input) => input.type
-                );
-                blockInputTypesSorted.sort();
-
-                return compareArrays(
-                    parsedParamsTypesSorted,
-                    blockInputTypesSorted
-                );
-            });
-
-            // If there are no matches set error to true.
-            if (matches.length == 0) {
-                console.warn("No maches found");
-                this.error = true;
-                return;
-            }
-
-            // if (matches.length > 1) {
-            //     console.warn("Multiple matches is not supported");
-            //     console.log(matches);
-            //     this.error = true;
-            //     return;
-            // }
-
-            const match =
-                matches.find((match) => match.name == "Segment") ?? matches[0]; // Temporary get always first match
-                
-            // If there are multiple outputs, the expression cannot be set to a variable. Until lists are implemented.
-            if (match.outputs.length > 1 && this._name) {
-                console.warn(
-                    "Unable to asing multiple objects to one variable"
-                );
-                this.error = true;
-                return;
-            }
-
-            const updatedValues = [];
-
-            match.outputs.map((output) => {
-                const parsedInputs = { ...output.inputs } as
-                    | SubBlock["inputs"]
-                    | { [key: string]: DiedricVector | DiedricNumber };
-
-                Object.entries(output.inputs).map((input, index) => {
-                    const blockId = input[1][0];
-
-                    let block: SubBlock | undefined;
-                    block = match.blocks.find((block) => block.id == blockId);
-                    if (!block) {
-                        block = match.inputs.find(
-                            (block) => block.id == blockId
-                        );
-                    }
-
-                    if (!block) {
-                        console.warn("Block not found. searching for", blockId);
-                        this.error = true;
-                        return;
-                    }
-                    if (block.type == "calc") {
-                        parsedInputs[input[0]] = this.evalCalcBlock(
-                            match,
-                            block
-                        );
-                    } else if (block.type == "crossVect") {
-                        parsedInputs[input[0]] = this.evalCrossVect(
-                            match,
-                            block
-                        );
-                    } else if (block.type == "calcVect") {
-                        parsedInputs[input[0]] = this.evalCalcVectBlock(
-                            match,
-                            block
-                        );
-                    } else if (
-                        this._parsedParams[index] instanceof DiedricPoint
-                    ) {
-                        // TODO - This condition has to be checked with other examples
-                        parsedInputs[input[0]] = this._parsedParams[index].r;
-                    } else {
-                        console.warn("Unkwown block.type", block.type);
-                    }
-                });
-
-                const valueToUpdate = this._values.find((value) => {
-                    return (
-                        value instanceof objects[output.type].prototype &&
-                        !updatedValues.includes(value)
-                    );
-                });
-                if (valueToUpdate) {
-                    // console.log("Object updated", valueToUpdate);
-                    updatedValues.push(valueToUpdate);
-                    Object.entries(parsedInputs).map((param) => {
-                        valueToUpdate[param[0]] = param[1];
-                    });
-                } else {
-                    console.log("parsedInputs", parsedInputs);
-                    // console.log("New object created");
-                    // @ts-expect-error Extremely hard to type parsedInputs.
-                    const newValue = new objects[output.type].prototype({
-                        diedric: this._diedric,
-                        ...parsedInputs,
-                    });
-                    updatedValues.push(newValue);
-                    this._values.push(newValue);
-                }
-            });
+            return;
         }
+        this._parsedParams = this._params.map((param) => {
+            const result = this._expressions.find(
+                (expression) => expression._name == param
+            );
+            if (result?._values.length == 1) {
+                return result?._values[0];
+            } else {
+                console.error(
+                    "this._parsedParams = this._params.map should not be more than one"
+                );
+            }
+        });
+
+        // If a parsed parameter is undefined because the expression doesn't exists or exists but it's value is undefined, set error to true.
+        if (this._parsedParams.includes(undefined)) {
+            console.warn("There is a _parsedParams that is undefined");
+
+            this.error = true;
+
+            this._expressions.forEach((expression) => {
+                if (
+                    expression._params &&
+                    expression._params.includes(this._name)
+                ) {
+                    expression.parseText();
+                }
+            });
+            return;
+        }
+
+        const parsedParamsTypesSorted = this._parsedParams.map(
+            (param) => param.type
+        );
+        parsedParamsTypesSorted.sort();
+
+        // Get matches by getting the blocks that have the same inputs as the parameters in the text.
+        const matches = blocks.filter((block) => {
+            const blockInputTypesSorted = block.inputs.map(
+                (input) => input.type
+            );
+            blockInputTypesSorted.sort();
+
+            return compareArrays(
+                parsedParamsTypesSorted,
+                blockInputTypesSorted
+            );
+        });
+
+        // If there are no matches set error to true.
+        if (matches.length == 0) {
+            console.warn("No maches found");
+            this.error = true;
+            return;
+        }
+
+        // if (matches.length > 1) {
+        //     console.warn("Multiple matches is not supported");
+        //     console.log(matches);
+        //     console.log(this._listeners);
+        //     console.log(this._listeners.multipleMatches);
+        // }
+
+        const preferredMatch = matches.find(
+            (match) => match.name == this._preferredMatch
+        );
+
+        if (this._preferredMatch && !preferredMatch) {
+            console.warn("Preferred match not found in matches");
+        }
+
+        const match = preferredMatch ?? matches[0]; // Temporary get always first match
+
+        this._preferredMatch = match.name;
+
+        this._listeners.multipleMatches.map((callback) =>
+            callback({
+                matches: matches.map((match) => match.name),
+                currentMatch: match.name,
+            })
+        );
+
+        // If there are multiple outputs, the expression cannot be set to a variable. Until lists are implemented.
+        if (match.outputs.length > 1 && this._name) {
+            console.warn("Unable to asing multiple objects to one variable");
+            this.error = true;
+            return;
+        }
+
+        const updatedValues = [];
+
+        match.outputs.map((output) => {
+            const parsedInputs = { ...output.inputs } as
+                | SubBlock["inputs"]
+                | { [key: string]: DiedricVector | DiedricNumber };
+
+            Object.entries(output.inputs).map((input, index) => {
+                const blockId = input[1][0];
+
+                let block: SubBlock | undefined;
+                block = match.blocks.find((block) => block.id == blockId);
+                if (!block) {
+                    block = match.inputs.find((block) => block.id == blockId);
+                }
+
+                if (!block) {
+                    console.warn("Block not found. searching for", blockId);
+                    this.error = true;
+                    return;
+                }
+                if (block.type == "calc") {
+                    parsedInputs[input[0]] = this.evalCalcBlock(match, block);
+                } else if (block.type == "crossVect") {
+                    parsedInputs[input[0]] = this.evalCrossVect(match, block);
+                } else if (block.type == "calcVect") {
+                    parsedInputs[input[0]] = this.evalCalcVectBlock(
+                        match,
+                        block
+                    );
+                } else if (this._parsedParams[index] instanceof DiedricPoint) {
+                    // TODO - This condition has to be checked with other examples
+                    parsedInputs[input[0]] = this._parsedParams[index].r;
+                } else {
+                    console.warn("Unkwown block.type", block.type);
+                }
+            });
+
+            const valueToUpdate = this._values.find((value) => {
+                return (
+                    value instanceof objects[output.type].prototype &&
+                    !updatedValues.includes(value)
+                );
+            });
+            if (valueToUpdate) {
+                // console.log("Object updated", valueToUpdate);
+                updatedValues.push(valueToUpdate);
+                Object.entries(parsedInputs).map((param) => {
+                    valueToUpdate[param[0]] = param[1];
+                });
+            } else {
+                // console.log("New object created");
+                // @ts-expect-error Extremely hard to type parsedInputs.
+                const newValue = new objects[output.type].prototype({
+                    diedric: this._diedric,
+                    ...parsedInputs,
+                });
+                updatedValues.push(newValue);
+                this._values.push(newValue);
+            }
+        });
         this._expressions.forEach((expression) => {
             if (expression._params && expression._params.includes(this._name)) {
                 expression.parseText();
             }
         });
+        this._values
+            .filter((x) => !updatedValues.includes(x))
+            .map((value) => value.delete());
+
+        this._values = updatedValues;
     }
 
     evalCalcBlock(match: Block, block: SubBlock) {
@@ -506,7 +555,7 @@ export class Expression {
             this._values = [];
         }
         this._listeners.errorUpdate.forEach((callback) =>
-            callback(this._error)
+            callback({ error: this._error })
         );
     }
     get error() {
@@ -516,9 +565,19 @@ export class Expression {
     get values() {
         return this._values;
     }
+
+    set preferredMatch(match: string) {
+        this._preferredMatch = match;
+        this.parseText();
+    }
+
+    get preferredMatch() {
+        return this._preferredMatch;
+    }
+
     addEventListener(
-        eventName: "delete" | "update" | "errorUpdate",
-        callback: (e?: boolean) => void
+        eventName: "delete" | "update" | "errorUpdate" | "multipleMatches",
+        callback: ExpressionListenerCallback
     ) {
         this._listeners[eventName].push(callback);
     }

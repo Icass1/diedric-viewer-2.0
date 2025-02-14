@@ -287,7 +287,8 @@ export class DiedricLine {
     }
 
     delete() {
+        this._diedric.canvas2d.remove(this.horizontalProjectionLine2d);
+        this._diedric.canvas2d.remove(this.verticalProjectionLine2d);
         this._diedric.scene.remove(this.cylinder);
-        console.warn("DiedricLine Implement delete");
     }
 }

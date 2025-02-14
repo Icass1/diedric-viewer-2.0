@@ -2,7 +2,6 @@ import { Diedric } from "./diedric";
 import { DiedricVector } from "./vector";
 import * as THREE from "three";
 import * as TWO from "../two/two";
-import { DiedricPoint } from "./point";
 
 export class DiedricSegment {
     type = "DiedricLine";
@@ -310,6 +309,7 @@ export class DiedricSegment {
 
     delete() {
         this._diedric.scene.remove(this.cylinder);
-        console.warn("DiedricLine Implement delete");
+        this._diedric.canvas2d.remove(this.horizontalProjectionLine2d);
+        this._diedric.canvas2d.remove(this.verticalProjectionLine2d);
     }
 }

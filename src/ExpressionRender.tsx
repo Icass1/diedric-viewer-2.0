@@ -8,31 +8,45 @@ addStyles();
 export function ExpressionRender({
     expression,
     index,
+    deleteExpression,
 }: {
     expression: Expression;
     index: number;
+    deleteExpression: (expression: Expression) => void;
 }) {
     const [latex, setLatex] = useState(expression.text);
+    const [matches, setMatches] = useState<string[]>([]);
+    const [match, setMatch] = useState<string>();
 
-    let tempSliderValue = undefined;
+    const [sliderValue, setSliderValue] = useState<number>();
 
-    if (
-        expression.values.length == 1 &&
-        expression.values[0] instanceof DiedricNumber
-    ) {
-        tempSliderValue = expression.values[0].x;
-    }
-
-    const [sliderValue, setSliderValue] = useState(tempSliderValue);
-
-    const [sliderMin, setSliderMin] = useState(Math.min(sliderValue, -200));
-    const [sliderMax, setSliderMax] = useState(Math.max(sliderValue, 200));
+    const [sliderMin, setSliderMin] = useState<number>();
+    const [sliderMax, setSliderMax] = useState<number>();
 
     const [error, setError] = useState<boolean>(expression.error);
     useEffect(() => {
         expression.addEventListener("errorUpdate", (e) => {
-            setError(e);
+            setError(e.error);
         });
+
+        expression.addEventListener("multipleMatches", (e) => {
+            setMatches(e.matches);
+            setMatch(e.currentMatch);
+        });
+        // Once event listeners are added, call parseText to process expression.
+        expression.parseText();
+
+        let tempSliderValue = undefined;
+
+        if (
+            expression.values.length == 1 &&
+            expression.values[0] instanceof DiedricNumber
+        ) {
+            tempSliderValue = expression.values[0].x;
+        }
+        setSliderValue(tempSliderValue);
+        setSliderMax(Math.max(tempSliderValue, 200));
+        setSliderMin(Math.min(tempSliderValue, -200));
     }, [expression]);
 
     return (
@@ -51,6 +65,10 @@ export function ExpressionRender({
                     id="react-mathquill-styles"
                     latex={latex}
                     onChange={(mathField) => {
+                        if (latex == "" && mathField.latex() == "") {
+                            deleteExpression(expression);
+                        }
+
                         setLatex(mathField.latex());
                         expression.text = mathField.latex();
                         if (
@@ -96,6 +114,29 @@ export function ExpressionRender({
                         <StaticMathField className="text-sm">
                             {sliderMax.toString()}
                         </StaticMathField>
+                    </div>
+                )}
+                {matches.length > 1 && !error && (
+                    <div className="flex flex-col gap-y-1">
+                        <label className="text-xs">
+                            There are multiple options
+                        </label>
+                        {matches.map((_match, index) => (
+                            <label
+                                key={index}
+                                onClick={() => {
+                                    expression.preferredMatch = _match;
+                                }}
+                                className={
+                                    "text-sm p-1 rounded" +
+                                    (_match == match
+                                        ? " bg-blue-400  text-blue-800"
+                                        : "")
+                                }
+                            >
+                                {_match}
+                            </label>
+                        ))}
                     </div>
                 )}
             </div>

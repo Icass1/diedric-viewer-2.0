@@ -36,7 +36,12 @@ function App() {
     const canvas2dRef = useRef<HTMLCanvasElement>(null);
     const [diedric, setDiedric] = useState<Diedric>();
 
-    const [block, setBlock] = useState<Block | undefined>(blocks[3]);
+    const [block, setBlock] = useState<Block | undefined>({
+        outputs: [],
+        inputs: [],
+        blocks: [],
+        name: "New block",
+    });
 
     useEffect(() => {
         if (!currentTab) return;
@@ -72,20 +77,36 @@ function App() {
         if (!expressions) return;
 
         const expressionsText = [
-            "A=-21",
-            "B=117",
-            "C=3",
-            "p=\\left(A,\\ B,\\ C\\right)",
-            "b=\\left(C,\\ A,\\ B\\right)",
-            "s=\\left(p,\\ b\\right)",
+            {
+                text: "A=-21",
+            },
+            {
+                text: "B=117",
+            },
+            {
+                text: "C=3",
+            },
+            {
+                text: "p=\\left(A,\\ B,\\ C\\right)",
+                preferredMatch: "Point OAC",
+            },
+            {
+                text: "b=\\left(C,\\ A,\\ B\\right)",
+                preferredMatch: "Point OAC",
+            },
+            {
+                text: "s=\\left(p,\\ b\\right)",
+                preferredMatch: "Segment",
+            },
         ];
 
-        expressionsText.map((text) =>
+        expressionsText.map((expr) =>
             expressions.current.push(
                 new Expression({
-                    text: text,
+                    text: expr.text,
                     expressions: expressions.current,
                     diedric: diedric,
+                    preferredMatch: expr.preferredMatch,
                 })
             )
         );
@@ -101,6 +122,14 @@ function App() {
         updater();
     }, [expressions, diedric]);
 
+    const deleteExpression = (expression: Expression) => {
+        expressions.current = expressions.current.filter(
+            (expr) => expr != expression
+        );
+
+        updater();
+    };
+
     return (
         <div className="grid grid-cols-[300px_1fr] h-full">
             <div className="bg-white border-r border-[#d7d7d7] border-solid">
@@ -112,7 +141,12 @@ function App() {
                         className="p-1 bg-neutral-400 rounded"
                         onClick={() => {
                             console.log(
-                                expressions.current.map((expr) => expr.text)
+                                expressions.current.map((expr) => {
+                                    return {
+                                        text: expr.text,
+                                        preferredMatch: expr.preferredMatch,
+                                    };
+                                })
                             );
                         }}
                     >
@@ -122,9 +156,10 @@ function App() {
                 <div className="flex flex-col  overflow-y-auto ">
                     {expressions.current.map((expression, index) => (
                         <ExpressionRender
-                            key={"expression-" + index}
+                            key={"expression-" + expression.id}
                             index={index}
                             expression={expression}
+                            deleteExpression={deleteExpression}
                         />
                     ))}
                     <div
@@ -144,6 +179,7 @@ function App() {
                             <ExpressionRender
                                 index={expressions.current.length}
                                 expression={newExpression}
+                                deleteExpression={deleteExpression}
                             />
                         )}
                         <div className="w-full h-full absolute bg-gradient-to-b from-transparent to-white top-0"></div>
@@ -166,13 +202,26 @@ function App() {
                                     key={"block-selection-" + block.name}
                                     onClick={() => {
                                         setBlock(block);
-                                        console.log(block);
                                     }}
                                     className="bg-neutral-400 rounded text-white p-1"
                                 >
                                     {block.name}
                                 </label>
                             ))}
+                            <label
+                                key={"block-selection-" + block.name}
+                                onClick={() => {
+                                    setBlock({
+                                        outputs: [],
+                                        inputs: [],
+                                        blocks: [],
+                                        name: "New block",
+                                    });
+                                }}
+                                className="bg-neutral-400 rounded text-white p-1"
+                            >
+                                New
+                            </label>
                         </div>
                     )}
 
