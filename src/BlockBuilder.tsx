@@ -7,10 +7,17 @@ function BlockInput({
     block,
     forDisplay = false,
     onClick,
+    setLineStart,
 }: {
     block: SubBlock;
     forDisplay?: boolean;
     onClick?: () => void;
+    setLineStart?: React.Dispatch<
+        React.SetStateAction<{
+            id: string;
+            param: [string, string];
+        }>
+    >;
 }) {
     return (
         <div
@@ -44,9 +51,19 @@ function BlockInput({
                             <label
                                 key={"input-param-" + index}
                                 id={block.id + "-" + param[0]}
-                                className="line-connector out bg-black/15 rounded-l-lg p-1 w-[30px] text-right pr-2"
+                                className="line-connector relative out bg-black/15 rounded-l-lg p-1 w-[30px] text-right pr-2"
                             >
                                 {param[0]}
+                                <div
+                                    onMouseDown={() => {
+                                        setLineStart &&
+                                            setLineStart({
+                                                id: block.id,
+                                                param: param,
+                                            });
+                                    }}
+                                    className="w-2 h-2 -right-1 hover:scale-150 transition-all cursor-pointer bg-[#ca7d7d] rounded-full absolute top-1/2 -translate-y-1/2"
+                                ></div>
                             </label>
                         );
                     }
@@ -60,10 +77,17 @@ function BlockBlock({
     block,
     forDisplay = false,
     onClick,
+    setLineStart,
 }: {
     block: SubBlock;
     forDisplay?: boolean;
     onClick?: () => void;
+    setLineStart?: React.Dispatch<
+        React.SetStateAction<{
+            id: string;
+            param: [string, string];
+        }>
+    >;
 }) {
     return (
         <div
@@ -128,7 +152,16 @@ function BlockBlock({
                                 {block.type == "calc" ? "a" : "\\bar v"}
                             </StaticMathField>
                         )}
-                        <div className="w-2 h-2 -right-1 hover:scale-150 transition-all cursor-pointer bg-[#43c559] rounded-full absolute top-1/2 -translate-y-1/2"></div>
+                        <div
+                            onClick={() => {
+                                setLineStart &&
+                                    setLineStart({
+                                        id: block.id,
+                                        param: ["value", undefined],
+                                    });
+                            }}
+                            className="w-2 h-2 -right-1 hover:scale-150 transition-all cursor-pointer bg-[#43c559] rounded-full absolute top-1/2 -translate-y-1/2"
+                        ></div>
                     </label>
                 </div>
             </div>
@@ -140,10 +173,17 @@ function BlockOutput({
     block,
     forDisplay = false,
     onClick,
+    setLineStart,
 }: {
     block: SubBlock;
     forDisplay?: boolean;
     onClick?: () => void;
+    setLineStart?: React.Dispatch<
+        React.SetStateAction<{
+            id: string;
+            param: [string, string];
+        }>
+    >;
 }) {
     {
         const [selected, setSelected] = useState(false);
@@ -156,7 +196,7 @@ function BlockOutput({
                         : setSelected((value) => !value)
                 }
                 className={
-                    "text-white py-2  w-fit  rounded-lg shadow-md select-none transition-all outline  " +
+                    "text-white py-2  w-fit  rounded-lg shadow-md select-none outline  " +
                     (typeof block.x == "number" && typeof block.y
                         ? " absolute "
                         : "") +
@@ -180,7 +220,10 @@ function BlockOutput({
                     {Object.entries(block.inputs).map((input, index) => {
                         return (
                             <StaticMathField
-                                onMouseUp={() => console.log("handleMouseUp")}
+                                onMouseUp={() => {
+                                    console.log("handleMouseUp");
+                                    setLineStart(undefined);
+                                }}
                                 id={input[1][0] + "-" + input[1][1]}
                                 key={"input-param-" + index}
                                 className="line-connector in bg-black/15 rounded-r-lg p-1 text-left pl-2 pr-2"
@@ -368,6 +411,43 @@ function OutputsForDisplay({
     );
 }
 
+const setupLines = (canvas: HTMLCanvasElement) => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    canvas.height = canvas.offsetHeight;
+    canvas.width = canvas.offsetWidth;
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+
+    const canvasBoundaries = canvas.getBoundingClientRect();
+
+    document.querySelectorAll(".line-connector.out").forEach((outElement) => {
+        document
+            .querySelectorAll(`#${outElement.id}.line-connector.in`)
+            .forEach((inElement) => {
+                const inBoundaries = inElement.getBoundingClientRect();
+                const outBoundaries = outElement.getBoundingClientRect();
+
+                ctx.beginPath();
+                ctx.moveTo(
+                    outBoundaries.x - canvasBoundaries.x + outBoundaries.width,
+                    outBoundaries.y -
+                        canvasBoundaries.y +
+                        outBoundaries.height / 2
+                );
+                ctx.lineTo(
+                    inBoundaries.x - canvasBoundaries.x,
+                    inBoundaries.y -
+                        canvasBoundaries.y +
+                        inBoundaries.height / 2
+                );
+                ctx.stroke();
+            });
+    });
+};
 export function BlockBuilder({ block }: { block: Block }) {
     // const colors = [
     //     "#c74440",
@@ -388,25 +468,36 @@ export function BlockBuilder({ block }: { block: Block }) {
         | undefined
     >();
 
+    const [lineStart, setLineStart] = useState<
+        | {
+              id: string;
+              param: [string, string];
+          }
+        | undefined
+    >();
+
     useEffect(() => {
         setBlock(block);
     }, [block]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-            if (!draggingObject) {
-                return;
-            }
-            const canvasBoundaries = canvasRef.current.getBoundingClientRect();
+            if (draggingObject) {
+                const canvasBoundaries =
+                    canvasRef.current.getBoundingClientRect();
 
-            setDraggingObject({
-                blockInfo: {
-                    ...draggingObject.blockInfo,
-                    x: e.clientX - canvasBoundaries.x,
-                    y: e.clientY - canvasBoundaries.y,
-                },
-                blockType: draggingObject.blockType,
-            });
+                setDraggingObject({
+                    blockInfo: {
+                        ...draggingObject.blockInfo,
+                        x: e.clientX - canvasBoundaries.x,
+                        y: e.clientY - canvasBoundaries.y,
+                    },
+                    blockType: draggingObject.blockType,
+                });
+            }
+            if (lineStart) {
+                console.log(lineStart);
+            }
         };
         const handleMouseUp = () => {
             if (!draggingObject) return;
@@ -446,8 +537,6 @@ export function BlockBuilder({ block }: { block: Block }) {
             setDraggingObject(undefined);
         };
 
-        // const ref = canvasRef.current;
-
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", handleMouseUp);
 
@@ -455,65 +544,17 @@ export function BlockBuilder({ block }: { block: Block }) {
             document.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("mouseup", handleMouseUp);
         };
-    }, [draggingObject, inBlock]);
+    }, [draggingObject, inBlock, lineStart]);
 
     useLayoutEffect(() => {
         if (!canvasRef.current) return;
-        const setupLines = () => {
-            const ctx = canvasRef.current.getContext("2d");
-            if (!ctx) return;
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 2;
-            canvasRef.current.height = canvasRef.current.offsetHeight;
-            canvasRef.current.width = canvasRef.current.offsetWidth;
-
-            ctx.fillStyle = "white";
-            ctx.fillRect(
-                0,
-                0,
-                canvasRef.current.offsetWidth,
-                canvasRef.current.offsetHeight
-            );
-
-            const canvasBoundaries = canvasRef.current.getBoundingClientRect();
-
-            document
-                .querySelectorAll(".line-connector.out")
-                .forEach((outElement) => {
-                    document
-                        .querySelectorAll(`#${outElement.id}.line-connector.in`)
-                        .forEach((inElement) => {
-                            const inBoundaries =
-                                inElement.getBoundingClientRect();
-                            const outBoundaries =
-                                outElement.getBoundingClientRect();
-
-                            ctx.beginPath();
-                            ctx.moveTo(
-                                outBoundaries.x -
-                                    canvasBoundaries.x +
-                                    outBoundaries.width,
-                                outBoundaries.y -
-                                    canvasBoundaries.y +
-                                    outBoundaries.height / 2
-                            );
-                            ctx.lineTo(
-                                inBoundaries.x - canvasBoundaries.x,
-                                inBoundaries.y -
-                                    canvasBoundaries.y +
-                                    inBoundaries.height / 2
-                            );
-                            ctx.stroke();
-                        });
-                });
-        };
 
         setTimeout(() => {
-            setupLines();
+            setupLines(canvasRef.current);
         }, 100);
 
         window.addEventListener("resize", () => {
-            setupLines();
+            setupLines(canvasRef.current);
         });
     }, [canvasRef, block, canvasScroll]);
 
@@ -562,6 +603,7 @@ export function BlockBuilder({ block }: { block: Block }) {
                     inBlock.inputs.map((input, index) => {
                         return (
                             <BlockInput
+                                setLineStart={setLineStart}
                                 key={"input-" + index + "-" + inBlock.name}
                                 block={input}
                             />
@@ -571,6 +613,7 @@ export function BlockBuilder({ block }: { block: Block }) {
                 {inBlock &&
                     inBlock.blocks.map((subBlock: SubBlock, index) => (
                         <BlockBlock
+                            setLineStart={setLineStart}
                             block={subBlock}
                             key={"block-" + index + "-" + inBlock.name}
                         />
@@ -578,6 +621,7 @@ export function BlockBuilder({ block }: { block: Block }) {
                 {inBlock &&
                     inBlock.outputs?.map((subBlock, index) => (
                         <BlockOutput
+                            setLineStart={setLineStart}
                             block={subBlock}
                             key={"output-" + index + "-" + inBlock.name}
                         />
