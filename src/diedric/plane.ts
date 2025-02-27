@@ -261,168 +261,168 @@ export class DiedricPlane {
 
         if (normal.x == 0) {
             if (horizontalProjectionPoints[0].z > 0) {
-                this.horizontalProjectionLine2d.start = new THREE.Vector2(
+                this.horizontalProjectionLine2d.start = new TWO.Vector2(
                     horizontalProjectionPoints[0].x,
                     horizontalProjectionPoints[0].z
                 );
-                this.horizontalProjectionLine2d.end = new THREE.Vector2(
+                this.horizontalProjectionLine2d.end = new TWO.Vector2(
                     horizontalProjectionPoints[1].x,
                     horizontalProjectionPoints[1].z
                 );
 
-                this.horizontalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.start = new TWO.Vector2(
                     0,
                     0
                 );
-                this.horizontalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.end = new TWO.Vector2(
                     0,
                     0
                 );
             } else {
-                this.horizontalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.start = new TWO.Vector2(
                     horizontalProjectionPoints[0].x,
                     horizontalProjectionPoints[0].z
                 );
-                this.horizontalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.end = new TWO.Vector2(
                     horizontalProjectionPoints[1].x,
                     horizontalProjectionPoints[1].z
                 );
 
-                this.horizontalProjectionLine2d.start = new THREE.Vector2(0, 0);
-                this.horizontalProjectionLine2d.end = new THREE.Vector2(0, 0);
+                this.horizontalProjectionLine2d.start = new TWO.Vector2(0, 0);
+                this.horizontalProjectionLine2d.end = new TWO.Vector2(0, 0);
             }
 
             if (verticalProjectionPoints[0].y > 0) {
-                this.verticalProjectionLine2d.start = new THREE.Vector2(
+                this.verticalProjectionLine2d.start = new TWO.Vector2(
                     verticalProjectionPoints[0].x,
                     -verticalProjectionPoints[0].y
                 );
-                this.verticalProjectionLine2d.end = new THREE.Vector2(
+                this.verticalProjectionLine2d.end = new TWO.Vector2(
                     verticalProjectionPoints[1].x,
                     -verticalProjectionPoints[1].y
                 );
 
-                this.verticalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.start = new TWO.Vector2(
                     0,
                     0
                 );
-                this.verticalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.end = new TWO.Vector2(
                     0,
                     0
                 );
             } else {
-                this.verticalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.start = new TWO.Vector2(
                     verticalProjectionPoints[0].x,
                     -verticalProjectionPoints[0].y
                 );
-                this.verticalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.end = new TWO.Vector2(
                     verticalProjectionPoints[1].x,
                     -verticalProjectionPoints[1].y
                 );
 
-                this.verticalProjectionLine2d.start = new THREE.Vector2(0, 0);
-                this.verticalProjectionLine2d.end = new THREE.Vector2(0, 0);
+                this.verticalProjectionLine2d.start = new TWO.Vector2(0, 0);
+                this.verticalProjectionLine2d.end = new TWO.Vector2(0, 0);
             }
         } else {
             if (horizontalProjectionPoints[0].z > 0) {
-                this.horizontalProjectionLine2d.start = new THREE.Vector2(
+                this.horizontalProjectionLine2d.start = new TWO.Vector2(
                     horizontalProjectionPoints[0].x,
                     horizontalProjectionPoints[0].z
                 );
-                this.horizontalProjectionLine2d.end = new THREE.Vector2(x, 0);
+                this.horizontalProjectionLine2d.end = new TWO.Vector2(x, 0);
 
-                this.horizontalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.start = new TWO.Vector2(
                     x,
                     0
                 );
-                this.horizontalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.end = new TWO.Vector2(
                     horizontalProjectionPoints[1].x,
                     horizontalProjectionPoints[1].z
                 );
             } else if (horizontalProjectionPoints[0].z < 0) {
                 // console.warn("Implementation missing 1");
-                this.horizontalProjectionLine2d.start = new THREE.Vector2(x, 0);
-                this.horizontalProjectionLine2d.end = new THREE.Vector2(
+                this.horizontalProjectionLine2d.start = new TWO.Vector2(x, 0);
+                this.horizontalProjectionLine2d.end = new TWO.Vector2(
                     horizontalProjectionPoints[1].x,
                     horizontalProjectionPoints[1].z
                 );
 
-                this.horizontalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.start = new TWO.Vector2(
                     horizontalProjectionPoints[0].x,
                     horizontalProjectionPoints[0].z
                 );
-                this.horizontalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.end = new TWO.Vector2(
                     x,
                     0
                 );
             } else {
-                this.horizontalProjectionLine2d.start = new THREE.Vector2(
+                this.horizontalProjectionLine2d.start = new TWO.Vector2(
                     horizontalProjectionPoints[0].x,
                     horizontalProjectionPoints[0].z
                 );
-                this.horizontalProjectionLine2d.end = new THREE.Vector2(
+                this.horizontalProjectionLine2d.end = new TWO.Vector2(
                     horizontalProjectionPoints[1].x,
                     horizontalProjectionPoints[1].z
                 );
 
-                this.horizontalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.start = new TWO.Vector2(
                     0,
                     0
                 );
-                this.horizontalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.horizontalProjectionLine2dDashed.end = new TWO.Vector2(
                     0,
                     0
                 );
             }
 
             if (-verticalProjectionPoints[0].y > 0) {
-                this.verticalProjectionLine2d.start = new THREE.Vector2(
+                this.verticalProjectionLine2d.start = new TWO.Vector2(
                     verticalProjectionPoints[0].x,
                     -verticalProjectionPoints[0].y
                 );
-                this.verticalProjectionLine2d.end = new THREE.Vector2(
+                this.verticalProjectionLine2d.end = new TWO.Vector2(
                     verticalProjectionPoints[1].x,
                     -verticalProjectionPoints[1].y
                 );
 
-                this.verticalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.start = new TWO.Vector2(
                     0,
                     0
                 );
-                this.verticalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.end = new TWO.Vector2(
                     0,
                     0
                 );
             } else if (-verticalProjectionPoints[0].y < 0) {
-                this.verticalProjectionLine2d.start = new THREE.Vector2(
+                this.verticalProjectionLine2d.start = new TWO.Vector2(
                     verticalProjectionPoints[0].x,
                     -verticalProjectionPoints[0].y
                 );
-                this.verticalProjectionLine2d.end = new THREE.Vector2(x, 0);
+                this.verticalProjectionLine2d.end = new TWO.Vector2(x, 0);
 
-                this.verticalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.start = new TWO.Vector2(
                     x,
                     0
                 );
-                this.verticalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.end = new TWO.Vector2(
                     verticalProjectionPoints[1].x,
                     -verticalProjectionPoints[1].y
                 );
             } else {
-                this.verticalProjectionLine2d.start = new THREE.Vector2(
+                this.verticalProjectionLine2d.start = new TWO.Vector2(
                     verticalProjectionPoints[0].x,
                     -verticalProjectionPoints[0].y
                 );
-                this.verticalProjectionLine2d.end = new THREE.Vector2(
+                this.verticalProjectionLine2d.end = new TWO.Vector2(
                     verticalProjectionPoints[1].x,
                     -verticalProjectionPoints[1].y
                 );
 
-                this.verticalProjectionLine2dDashed.start = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.start = new TWO.Vector2(
                     0,
                     0
                 );
-                this.verticalProjectionLine2dDashed.end = new THREE.Vector2(
+                this.verticalProjectionLine2dDashed.end = new TWO.Vector2(
                     0,
                     0
                 );

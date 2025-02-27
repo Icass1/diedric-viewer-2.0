@@ -162,43 +162,43 @@ export class Diedric {
 
     drawEarthLine() {
         let line = new TWO.Line({ color: "black" });
-        line.start = new THREE.Vector2(-this.size, 0);
-        line.end = new THREE.Vector2(this.size, 0);
+        line.start = new TWO.Vector2(-this.size, 0);
+        line.end = new TWO.Vector2(this.size, 0);
         this.canvas2d.add(line);
 
         line = new TWO.Line({ color: "black" });
-        line.start = new THREE.Vector2(-this.size + 3, 6);
-        line.end = new THREE.Vector2(-this.size + 15, 6);
+        line.start = new TWO.Vector2(-this.size + 3, 6);
+        line.end = new TWO.Vector2(-this.size + 15, 6);
         this.canvas2d.add(line);
 
         line = new TWO.Line({ color: "black" });
-        line.start = new THREE.Vector2(this.size - 3, 6);
-        line.end = new THREE.Vector2(this.size - 15, 6);
+        line.start = new TWO.Vector2(this.size - 3, 6);
+        line.end = new TWO.Vector2(this.size - 15, 6);
         this.canvas2d.add(line);
 
         line = new TWO.Line({ color: "black" });
-        line.start = new THREE.Vector2(0, 5);
-        line.end = new THREE.Vector2(0, -5);
+        line.start = new TWO.Vector2(0, 5);
+        line.end = new TWO.Vector2(0, -5);
         this.canvas2d.add(line);
 
         line = new TWO.Line({ color: "rgb(200, 200, 200)" });
-        line.start = new THREE.Vector2(-this.size, -this.size);
-        line.end = new THREE.Vector2(-this.size, this.size);
+        line.start = new TWO.Vector2(-this.size, -this.size);
+        line.end = new TWO.Vector2(-this.size, this.size);
         this.canvas2d.add(line);
 
         line = new TWO.Line({ color: "rgb(200, 200, 200)" });
-        line.start = new THREE.Vector2(-this.size, this.size);
-        line.end = new THREE.Vector2(this.size, this.size);
+        line.start = new TWO.Vector2(-this.size, this.size);
+        line.end = new TWO.Vector2(this.size, this.size);
         this.canvas2d.add(line);
 
         line = new TWO.Line({ color: "rgb(200, 200, 200)" });
-        line.start = new THREE.Vector2(this.size, this.size);
-        line.end = new THREE.Vector2(this.size, -this.size);
+        line.start = new TWO.Vector2(this.size, this.size);
+        line.end = new TWO.Vector2(this.size, -this.size);
         this.canvas2d.add(line);
 
         line = new TWO.Line({ color: "rgb(200, 200, 200)" });
-        line.start = new THREE.Vector2(this.size, -this.size);
-        line.end = new THREE.Vector2(-this.size, -this.size);
+        line.start = new TWO.Vector2(this.size, -this.size);
+        line.end = new TWO.Vector2(-this.size, -this.size);
         this.canvas2d.add(line);
     }
 

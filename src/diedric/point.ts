@@ -124,14 +124,14 @@ export class DiedricPoint {
         this.lineToY0Line.computeLineDistances();
         this.lineToZ0Line.computeLineDistances();
 
-        this.verticalProjection.pos = new THREE.Vector2(newR.x.x, -newR.y.x);
-        this.horizontalProjection.pos = new THREE.Vector2(newR.x.x, newR.z.x);
+        this.verticalProjection.pos = new TWO.Vector2(newR.x.x, -newR.y.x);
+        this.horizontalProjection.pos = new TWO.Vector2(newR.x.x, newR.z.x);
 
-        this.verticalProjectionLabel.pos = new THREE.Vector2(
+        this.verticalProjectionLabel.pos = new TWO.Vector2(
             newR.x.x,
             -newR.y.x
         );
-        this.horizontalProjectionLabel.pos = new THREE.Vector2(
+        this.horizontalProjectionLabel.pos = new TWO.Vector2(
             newR.x.x,
             newR.z.x
         );
